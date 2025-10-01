@@ -162,7 +162,7 @@ func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
 func getSubTokens(token string) []string {
 	tokens := strings.Split(token, "(")
 	if len(tokens[0]) == 0 {
-
+		// TODO: actually do something
 	}
 	return tokens
 }
