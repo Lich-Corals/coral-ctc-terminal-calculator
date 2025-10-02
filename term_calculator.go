@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public Licence
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Testing with "2 * (3 + (2 + 6) * 4) + ( 2 // 9! ) + 200 ** 0 + -5"
+// Testing with "2 * (3 + (2 + 6) * 4) + ( 2 // 9 ! ) + 200 ** 0 + -5 * (1 + 2) !"
 //
 // Priorities:
 // A. powers, factorials, roots
@@ -27,14 +27,16 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
 var (
-	numberRegex          = regexp.MustCompile(`^-{0,1}\d+(?:,\d+){0,1}$`)
-	factorialNumberRegex = regexp.MustCompile(`^-{0,1}\d+!$`)
+	numberRegex        = regexp.MustCompile(`^-{0,1}\d+(?:,\d+){0,1}$`)
+	decimalNumberRegex = regexp.MustCompile(`^-{0,1}\d+,\d+$`)
 )
 
 type tokenType int8
@@ -44,12 +46,12 @@ const (
 	unknownTokenType tokenType = iota
 	number
 	addition
-	substriction
+	substraction
 	multiplication
 	division
 	power
 	root
-	factorialNumber
+	factorial
 	openDelim
 	closeDelim
 )
@@ -66,6 +68,10 @@ type token struct {
 	priority  tokenPriority
 	content   []string
 	subTokens []token
+	sum       float64
+	a         float64
+	b         float64
+	used      bool
 }
 
 // Get tokens from input string
@@ -96,7 +102,87 @@ func getTokens(arg string) []token {
 
 	fmt.Println(grouped)
 
+	var summed = getSum(grouped)
+
+	fmt.Println(summed)
+
 	return ungrouped
+}
+
+// Add the sums to a list of tokens
+func getSum(tokens []token) []token {
+	var summed = []token{}
+	for _, tok := range tokens {
+		switch tok.token {
+		case number:
+			val, err := strconv.ParseFloat(tok.content[0], 64)
+			if err != nil {
+				panic(fmt.Sprint("Cannot convert to number:", tok.content[0]))
+			}
+			tok.sum = val
+			summed = append(summed, tok)
+		case openDelim:
+			tok.subTokens = getSum(tok.subTokens)
+			var sum = 0.0
+			for _, sT := range tok.subTokens {
+				sum += sT.sum
+			}
+			tok.sum = sum
+			summed = append(summed, tok)
+		default:
+			summed = append(summed, tok)
+		}
+	}
+	for _, ee := range summed {
+		fmt.Println(ee.content, ee.sum)
+	}
+	var priorities = []tokenPriority{pA, pB, pC}
+	var group = summed
+	var groupA = []token{}
+	for _, pri := range priorities {
+		var skipIndex = -1
+		switch pri {
+		case pA:
+			for i, tok := range group {
+				if i != skipIndex {
+					switch tok.token {
+					case factorial:
+						var a = summed[i-1]
+						tok.sum = fact(a.sum)
+						groupA = groupA[:len(groupA)-1]
+						groupA = append(groupA, tok)
+					case power:
+						var a = summed[i-1]
+						var b = summed[i+1]
+						tok.sum = math.Pow(a.sum, b.sum)
+						groupA = groupA[:len(groupA)-1]
+						skipIndex = i + 1
+						fmt.Println(tok)
+						groupA = append(groupA, tok)
+					case root:
+						var a = summed[i-1]
+						var b = summed[i+1]
+						tok.sum = math.Pow(b.sum, 1.0/a.sum)
+						groupA = groupA[:len(groupA)-1]
+						skipIndex = i + 1
+						groupA = append(groupA, tok)
+					default:
+						groupA = append(groupA, tok)
+					}
+				}
+			}
+		}
+	}
+	return groupA
+}
+
+// Find the factorial of a number
+func fact(n float64) float64 {
+	if n == 1 || n == 0 {
+		return 1.0
+	}
+	var fact = n * fact(n-1)
+	return fact
 }
 
 // Move all contents of delimiters into the sub-tokens part of their opening delimiter
@@ -163,7 +249,7 @@ func processToken(part string) []token {
 	var tokens = []token{}
 	for _, part := range parts {
 		var tT, tP = getTokenTypeAndPriority(part)
-		tokens = append(tokens, token{token: tT, priority: tP, content: []string{part}, subTokens: nil})
+		tokens = append(tokens, token{token: tT, priority: tP, content: []string{part}, subTokens: nil, used: false})
 	}
 	return tokens
 }
@@ -172,14 +258,12 @@ func processToken(part string) []token {
 func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
 	if len(numberRegex.FindAllString(content, -1)) == 1 {
 		return number, pX
-	} else if len(factorialNumberRegex.FindAllString(content, -1)) == 1 {
-		return factorialNumber, pA
 	} else {
 		switch content {
 		case "+":
 			return addition, pC
 		case "-":
-			return substriction, pC
+			return substraction, pC
 		case "*":
 			return multiplication, pB
 		case "/":
@@ -188,6 +272,8 @@ func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
 			return power, pA
 		case "//":
 			return root, pA
+		case "!":
+			return factorial, pA
 		case "(":
 			return openDelim, pX
 		case ")":
