@@ -40,7 +40,7 @@ var (
 )
 
 var (
-	emptyToken = token{token: unknownTokenType, priority: pX, content: nil, subTokens: nil, unprocessed: nil}
+	emptyToken = token{token: unknownTokenType, priority: pX, content: nil, subTokens: nil}
 )
 
 type tokenType int8
@@ -69,26 +69,21 @@ const (
 )
 
 type token struct {
-	token       tokenType
-	priority    tokenPriority
-	content     []string
-	subTokens   []token
-	unprocessed []string
+	token     tokenType
+	priority  tokenPriority
+	content   []string
+	subTokens []token
 }
 
 // Get tokens from input string
 func getTokens(arg string) []token {
 	var ungrouped = []token{}
-
 	for tok := range strings.SplitSeq(arg, " ") {
 		for _, t := range processToken(tok) {
 			ungrouped = append(ungrouped, t)
 		}
 	}
 
-	for _, tex := range ungrouped {
-		fmt.Println(tex.content, tex.token)
-	}
 	return ungrouped
 }
 
@@ -126,7 +121,7 @@ func processToken(part string) []token {
 	var tokens = []token{}
 	for _, part := range parts {
 		var tT, tP = getTokenTypeAndPriority(part)
-		tokens = append(tokens, token{token: tT, priority: tP, content: []string{part}, subTokens: nil, unprocessed: nil})
+		tokens = append(tokens, token{token: tT, priority: tP, content: []string{part}, subTokens: nil})
 	}
 	return tokens
 }
@@ -162,7 +157,6 @@ func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
 		}
 	}
 	panic(fmt.Sprint("Unknown token: ", content))
-	return unknownTokenType, pX
 }
 
 func main() {
