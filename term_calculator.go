@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public Licence
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Testing with "2 * (3 + (2 + 6) * 2) + ( 9! // 2 ) + 200 ** 0 + -5"
+// Testing with "2 * (3 + (2 + 6) * 4) + ( 2 // 9! ) + 200 ** 0 + -5"
 //
 // Priorities:
 // A. powers, factorials, roots
@@ -33,7 +33,7 @@ import (
 )
 
 var (
-	numberRegex          = regexp.MustCompile(`^-{0,1}\d+$`)
+	numberRegex          = regexp.MustCompile(`^-{0,1}\d+(?:,\d+){0,1}$`)
 	factorialNumberRegex = regexp.MustCompile(`^-{0,1}\d+!$`)
 )
 
@@ -92,10 +92,44 @@ func getTokens(arg string) []token {
 		panic("Unmatched '('")
 	}
 
+	var grouped = makeGroups(ungrouped)
+
+	fmt.Println(grouped)
+
 	return ungrouped
 }
 
-// Split a string like 'sqrt(9' into sub-tokens
+// Move all contents of delimiters into the sub-tokens part of their opening delimiter
+func makeGroups(tokens []token) []token {
+	var grouped = []token{}
+	var startIndex = 0
+	for ii, tok := range tokens {
+		if ii >= startIndex {
+			if tok.token == openDelim {
+				var deS = 1
+				for i, t := range tokens[ii+1:] {
+					switch t.token {
+					case openDelim:
+						deS += 1
+					case closeDelim:
+						deS -= 1
+					}
+					if deS == 0 {
+						tok.subTokens = makeGroups(tokens[ii : i+ii+1])
+						grouped = append(grouped, tok)
+						startIndex = i + ii + 1
+						break
+					}
+				}
+			} else if tok.token != closeDelim {
+				grouped = append(grouped, tok)
+			}
+		}
+	}
+	return grouped
+}
+
+// Split a string like '(6' into sub-tokens
 func getSubTokens(part string) []string {
 	var retVal = []string{}
 	var s = false
@@ -123,7 +157,7 @@ func getSubTokens(part string) []string {
 	return retVal
 }
 
-// Process an unprocessed token part
+// Get tokens from a string like "6", "(9" or "**"
 func processToken(part string) []token {
 	var parts = getSubTokens(part)
 	var tokens = []token{}
