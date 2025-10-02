@@ -39,10 +39,6 @@ var (
 	factorialNumberRegex          = regexp.MustCompile(`^\d+!$`)
 )
 
-var (
-	emptyToken = token{token: unknownTokenType, priority: pX, content: nil, subTokens: nil}
-)
-
 type tokenType int8
 type tokenPriority int8
 
