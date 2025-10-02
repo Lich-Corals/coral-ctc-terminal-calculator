@@ -29,14 +29,12 @@ import (
 	"fmt"
 	"os"
 	"regexp"
-	"slices"
 	"strings"
 )
 
 var (
-	functionNames        []string = []string{}
-	numberRegex                   = regexp.MustCompile(`^\d+$`)
-	factorialNumberRegex          = regexp.MustCompile(`^\d+!$`)
+	numberRegex          = regexp.MustCompile(`^\d+$`)
+	factorialNumberRegex = regexp.MustCompile(`^\d+!$`)
 )
 
 type tokenType int8
@@ -54,7 +52,6 @@ const (
 	factorialNumber
 	openDelim
 	closeDelim
-	functionName
 )
 
 const (
@@ -146,10 +143,6 @@ func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
 			return openDelim, pX
 		case ")":
 			return closeDelim, pX
-		}
-
-		if slices.Contains(functionNames, content) {
-			return functionName, pX
 		}
 	}
 	panic(fmt.Sprint("Unknown token: ", content))
