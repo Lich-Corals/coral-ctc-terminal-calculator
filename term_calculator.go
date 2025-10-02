@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU Affero General Public Licence
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Testing with "2 * (3 + (2 + 6) * 2) + sqrt(9) + 200 ** 0"
+// Testing with "2 * (3 + (2 + 6) * 2) + ( 9! // 2 ) + 200 ** 0"
 //
 // Priorities:
-// A. powers & factorials
+// A. powers, factorials, roots
 // B. multiplication and division
 // C. addition and substriction
 //
@@ -26,6 +26,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"regexp"
 	"slices"
@@ -33,10 +34,9 @@ import (
 )
 
 var (
-	tokenSplitPoints     []string = []string{"(", ")"}
-	functionNames        []string = []string{"sqrt"}
-	numberRegex                   = regexp.MustCompile(`\d+`)
-	factorialNumberRegex          = regexp.MustCompile(`\d+!`)
+	functionNames        []string = []string{}
+	numberRegex                   = regexp.MustCompile(`^\d+$`)
+	factorialNumberRegex          = regexp.MustCompile(`^\d+!$`)
 )
 
 var (
@@ -54,6 +54,7 @@ const (
 	multiplication
 	division
 	power
+	root
 	factorialNumber
 	openDelim
 	closeDelim
@@ -77,61 +78,64 @@ type token struct {
 
 // Get tokens from input string
 func getTokens(arg string) []token {
-	var tokens = make([][]token, 2)
-	var usedTokens = 1
-	var otherTokens = 0
-	var run bool = true
-	tokens[usedTokens] = getUnprocessedTokens(strings.Split(arg, " "))
-	for run {
-		if usedTokens == 0 {
-			usedTokens = 1
-			otherTokens = 0
-		} else {
-			usedTokens = 0
-			otherTokens = 1
-		}
-		tokens[usedTokens] = []token{}
-		for _, tok := range tokens[usedTokens] {
-			if len(tok.unprocessed) > 0 {
-				for _, tP := range tok.unprocessed {
-					processTokenPart(tP)
-				}
-			}
+	var ungrouped = []token{}
+
+	for tok := range strings.SplitSeq(arg, " ") {
+		for _, t := range processToken(tok) {
+			ungrouped = append(ungrouped, t)
 		}
 	}
-	return tokens[otherTokens]
+
+	for _, tex := range ungrouped {
+		fmt.Println(tex.content, tex.token)
+	}
+	return ungrouped
+}
+
+// Split a string like 'sqrt(9' into sub-tokens
+func getSubTokens(part string) []string {
+	var retVal = []string{}
+	var s = false
+	if strings.Contains(part, ")") && strings.Contains(part, "(") {
+		panic(fmt.Sprint("One token may never contain both '(' and ')': ", part))
+	}
+	if strings.Contains(part, "(") {
+		s = true
+		var pts = strings.Split(part, "(")
+		retVal = append(retVal, "(")
+		if len(pts[1]) > 0 {
+			retVal = append(retVal, pts[1])
+		}
+	} else if strings.Contains(part, ")") {
+		s = true
+		var pts = strings.Split(part, ")")
+		if len(pts[0]) > 0 {
+			retVal = append(retVal, pts[0])
+		}
+		retVal = append(retVal, ")")
+	}
+	if !s {
+		retVal = []string{part}
+	}
+	return retVal
 }
 
 // Process an unprocessed token part
-func processTokenPart(part string) token {
-	var s = false
-	for _, sP := range tokenSplitPoints {
-		if strings.Contains(part, sP) {
-			s = true
-			// TODO: Extract sub-tokens for data in brackets
-		}
-	}
-	if !s {
+func processToken(part string) []token {
+	var parts = getSubTokens(part)
+	var tokens = []token{}
+	for _, part := range parts {
 		var tT, tP = getTokenTypeAndPriority(part)
-		return token{token: tT, priority: tP, content: []string{part}, subTokens: nil, unprocessed: nil}
+		tokens = append(tokens, token{token: tT, priority: tP, content: []string{part}, subTokens: nil, unprocessed: nil})
 	}
-	return emptyToken
-}
-
-// convert a list of strings into unprocessed tokens
-func getUnprocessedTokens(data []string) []token {
-	var tks []token
-	for _, d := range data {
-		tks = append(tks, token{token: unknownTokenType, priority: pX, content: nil, subTokens: nil, unprocessed: []string{d}})
-	}
-	return tks
+	return tokens
 }
 
 // Get the type and priority of an isolated token
 func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
-	if len(numberRegex.FindAllString(content, -1)) > 0 {
+	if len(numberRegex.FindAllString(content, -1)) == 1 {
 		return number, pX
-	} else if len(factorialNumberRegex.FindAllString(content, -1)) > 0 {
+	} else if len(factorialNumberRegex.FindAllString(content, -1)) == 1 {
 		return factorialNumber, pA
 	} else {
 		switch content {
@@ -145,6 +149,8 @@ func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
 			return division, pB
 		case "**":
 			return power, pA
+		case "//":
+			return root, pA
 		case "(":
 			return openDelim, pX
 		case ")":
@@ -155,16 +161,8 @@ func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
 			return functionName, pX
 		}
 	}
+	panic(fmt.Sprint("Unknown token: ", content))
 	return unknownTokenType, pX
-}
-
-// Get sub token of tokens like "(6" or "sqrt(9)"
-func getSubTokens(token string) []string {
-	tokens := strings.Split(token, "(")
-	if len(tokens[0]) == 0 {
-		// TODO: actually do something
-	}
-	return tokens
 }
 
 func main() {
