@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public Licence
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Testing with "2 * (3 + (2 + 6) * 2) + ( 9! // 2 ) + 200 ** 0"
+// Testing with "2 * (3 + (2 + 6) * 2) + ( 9! // 2 ) + 200 ** 0 + -5"
 //
 // Priorities:
 // A. powers, factorials, roots
@@ -33,8 +33,8 @@ import (
 )
 
 var (
-	numberRegex          = regexp.MustCompile(`^\d+$`)
-	factorialNumberRegex = regexp.MustCompile(`^\d+!$`)
+	numberRegex          = regexp.MustCompile(`^-{0,1}\d+$`)
+	factorialNumberRegex = regexp.MustCompile(`^-{0,1}\d+!$`)
 )
 
 type tokenType int8
