@@ -77,6 +77,21 @@ func getTokens(arg string) []token {
 		}
 	}
 
+	var brS = 0
+	for _, tok := range ungrouped {
+		switch tok.token {
+		case openDelim:
+			brS += 1
+		case closeDelim:
+			brS -= 1
+		}
+	}
+	if brS < 0 {
+		panic("Unmatched ')'")
+	} else if brS > 0 {
+		panic("Unmatched '('")
+	}
+
 	return ungrouped
 }
 
