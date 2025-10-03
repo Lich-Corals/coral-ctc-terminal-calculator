@@ -64,6 +64,12 @@ const (
 	pC
 )
 
+const (
+	ansiRed   = "\033[31m"
+	ansiReset = "\033[0m"
+	ansiBlue  = "\033[34m"
+)
+
 type token struct {
 	token     tokenType
 	priority  tokenPriority
@@ -91,9 +97,9 @@ func getTokens(arg string) []token {
 		}
 	}
 	if brS < 0 {
-		panic("Unmatched ')'")
+		quitWithError("Unmatched ')'")
 	} else if brS > 0 {
-		panic("Unmatched '('")
+		quitWithError("Unmatched '('")
 	}
 
 	var grouped = makeGroups(ungrouped)
@@ -109,11 +115,11 @@ func getSum(tokens []token) float64 {
 		case number:
 			val, err := strconv.ParseFloat(tok.content[0], 64)
 			if err != nil {
-				panic(fmt.Sprint("Cannot convert to number: ", tok.content[0]))
+				quitWithError(fmt.Sprint("Cannot convert to number: ", tok.content[0]))
 			}
 			tok.sum = val
 		case openDelim:
-			tok.sum = getSum(tok.subTokens) // Calculates bracket-contents recursively
+			tok.sum = getSum(tok.subTokens) // Calculates parenthesized-contents recursively
 		}
 		summed = append(summed, tok)
 	}
@@ -122,10 +128,10 @@ func getSum(tokens []token) float64 {
 	for i, tok := range summed {
 		if tok.token == factorial {
 			if len(decimalNumberRegex.FindAllString(summed[i-1].content[0], -1)) != 0 {
-				panic(fmt.Sprint("Factorial numbers can't be based on decimal numbers: ", summed[i-1].sum, " !"))
+				quitWithError(fmt.Sprint("Factorial numbers can't be based on decimal numbers: ", summed[i-1].sum, " !"))
 			}
 			if summed[i-1].sum < 0 {
-				panic(fmt.Sprint("You can't get the factorial of a negative number: ", summed[i-1].sum, " !"))
+				quitWithError(fmt.Sprint("You can't get the factorial of a negative number: ", summed[i-1].sum, " !"))
 			}
 			tok.token = number
 			tok.priority = pX
@@ -135,7 +141,7 @@ func getSum(tokens []token) float64 {
 		withFactorials = append(withFactorials, tok)
 	}
 	var priorities = []tokenPriority{pA, pB, pC}
-	var groups = make([][]token, 2)
+	var groups = make([][]token, 2) // The following code is switching between two groups to prevent editing of the slice it is currently iterating over
 	var this = 0
 	var other = 1
 	groups[this] = withFactorials
@@ -159,7 +165,12 @@ func getSum(tokens []token) float64 {
 						tok.sum = a.sum * b.sum
 					case division:
 						if b.sum == 0.0 {
-							panic(fmt.Sprint("You can't divide by 0: ", a.sum, " / ", b.sum))
+							if a.sum == 0.0 {
+								println(ansiRed, fmt.Sprint("You can't divide by 0: ", a.sum, " / ", b.sum), ansiBlue, "\nNever gonna give you up!\nNever gonna let you down\n...", ansiReset)
+								os.Exit(69)
+							} else {
+								quitWithError(fmt.Sprint("You can't divide by 0: ", a.sum, " / ", b.sum))
+							}
 						}
 						tok.sum = a.sum / b.sum
 					case addition:
@@ -205,7 +216,7 @@ func fact(n float64) float64 {
 	return fact
 }
 
-// Move all contents of delimiters into the sub-tokens part of their opening delimiter
+// Move all contents of parentheses into the sub-tokens part of their opening delimiter
 func makeGroups(tokens []token) []token {
 	var grouped = []token{}
 	var startIndex = 0
@@ -240,7 +251,7 @@ func getSubTokens(part string) []string {
 	var retVal = []string{}
 	var s = false
 	if strings.Contains(part, ")") && strings.Contains(part, "(") {
-		panic(fmt.Sprint("One token may never contain both '(' and ')': ", part))
+		quitWithError(fmt.Sprint("One token may never contain both '(' and ')': ", part))
 	}
 	if strings.Contains(part, "(") {
 		s = true
@@ -300,7 +311,14 @@ func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
 			return closeDelim, pX
 		}
 	}
-	panic(fmt.Sprint("Unknown token: ", content))
+	quitWithError(fmt.Sprint("Unknown token: ", content))
+	return unknownTokenType, pX
+}
+
+// Show an error to the user
+func quitWithError(content string) {
+	println(ansiRed, content, ansiReset)
+	os.Exit(1)
 }
 
 func main() {
