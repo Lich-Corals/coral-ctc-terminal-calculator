@@ -319,6 +319,7 @@ func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
 // Show an error to the user
 func quitWithError(content string) {
 	println(ansiRed, content, ansiReset)
+	println(ansiBlue, "If you believe this is a bug, please open an issue: https://github.com/Lich-Corals/coral-ctc-terminal-calculator/issues", ansiReset)
 	os.Exit(1)
 }
 
@@ -326,6 +327,11 @@ func main() {
 	var terminalArguments = os.Args
 	var tokens []token
 	var sum float64
+	if len(terminalArguments) < 2 {
+		quitWithError("Missing an argument!")
+	} else if len(terminalArguments) > 2 {
+		quitWithError("Too many arguments!")
+	}
 	for i, v := range terminalArguments {
 		if i == len(terminalArguments)-1 { // Use the last argument to get operations
 			tokens = getTokens(v)
