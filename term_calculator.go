@@ -98,11 +98,7 @@ func getTokens(arg string) []token {
 
 	var grouped = makeGroups(ungrouped)
 
-	var sum = getSum(grouped)
-
-	fmt.Println(sum)
-
-	return ungrouped
+	return grouped
 }
 
 // calculate
@@ -113,17 +109,18 @@ func getSum(tokens []token) float64 {
 		case number:
 			val, err := strconv.ParseFloat(tok.content[0], 64)
 			if err != nil {
-				panic(fmt.Sprint("Cannot convert to number:", tok.content[0]))
+				panic(fmt.Sprint("Cannot convert to number: ", tok.content[0]))
 			}
 			tok.sum = val
 			summed = append(summed, tok)
 		case openDelim:
-			tok.sum = getSum(tok.subTokens)
+			tok.sum = getSum(tok.subTokens) // Calculates bracket-contents recursively
 			summed = append(summed, tok)
 		default:
 			summed = append(summed, tok)
 		}
 	}
+	// Faculties are converted into numbers before any other calculations start
 	var withFactorials = []token{}
 	for i, tok := range summed {
 		if tok.token == factorial {
@@ -155,77 +152,32 @@ func getSum(tokens []token) float64 {
 			var skip = false
 			for i, tok := range groups[this] {
 				if tok.priority == pri && r {
+					var a = groups[this][i-1]
+					var b = groups[this][i+1]
+					tok.priority = pX
 					switch tok.token {
 					case power:
-						var a = groups[this][i-1]
-						var b = groups[this][i+1]
 						tok.sum = math.Pow(a.sum, b.sum)
-						tok.token = number
-						tok.priority = pX
-						groups[other] = groups[other][:len(groups[other])-1]
-						groups[other] = append(groups[other], tok)
-						groups[other] = append(groups[other], groups[other][i:]...)
-						skip = true
-						r = false
 					case root:
-						var a = groups[this][i-1]
-						var b = groups[this][i+1]
 						tok.sum = math.Pow(b.sum, 1.0/a.sum)
-						tok.token = number
-						tok.priority = pX
-						groups[other] = groups[other][:len(groups[other])-1]
-						groups[other] = append(groups[other], tok)
-						groups[other] = append(groups[other], groups[other][i:]...)
-						skip = true
-						r = false
 					case multiplication:
-						var a = groups[this][i-1]
-						var b = groups[this][i+1]
 						tok.sum = a.sum * b.sum
-						tok.token = number
-						tok.priority = pX
-						groups[other] = groups[other][:len(groups[other])-1]
-						groups[other] = append(groups[other], tok)
-						groups[other] = append(groups[other], groups[other][i:]...)
-						skip = true
-						r = false
 					case division:
-						var a = groups[this][i-1]
-						var b = groups[this][i+1]
 						if b.sum == 0.0 {
 							panic(fmt.Sprint("You can't divide by 0: ", a.sum, " / ", b.sum))
 						}
 						tok.sum = a.sum / b.sum
-						tok.token = number
-						tok.priority = pX
-						groups[other] = groups[other][:len(groups[other])-1]
-						groups[other] = append(groups[other], tok)
-						groups[other] = append(groups[other], groups[other][i:]...)
-						skip = true
-						r = false
 					case addition:
-						var a = groups[this][i-1]
-						var b = groups[this][i+1]
 						tok.sum = a.sum + b.sum
-						tok.token = number
-						tok.priority = pX
-						groups[other] = groups[other][:len(groups[other])-1]
-						groups[other] = append(groups[other], tok)
-						groups[other] = append(groups[other], groups[other][i:]...)
-						skip = true
-						r = false
 					case subtraction:
-						var a = groups[this][i-1]
-						var b = groups[this][i+1]
 						tok.sum = a.sum - b.sum
-						tok.token = number
-						tok.priority = pX
-						groups[other] = groups[other][:len(groups[other])-1]
-						groups[other] = append(groups[other], tok)
-						groups[other] = append(groups[other], groups[other][i:]...)
-						skip = true
-						r = false
 					}
+					tok.token = number
+					groups[other] = groups[other][:len(groups[other])-1]
+					groups[other] = append(groups[other], tok)
+					groups[other] = append(groups[other], groups[other][i:]...)
+					skip = true
+					r = false
 				} else {
 					if skip {
 						skip = false
@@ -359,10 +311,12 @@ func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
 func main() {
 	var terminalArguments = os.Args
 	var tokens []token
+	var sum float64
 	for i, v := range terminalArguments {
 		if i == len(terminalArguments)-1 { // Use the last argument to get operations
 			tokens = getTokens(v)
+			sum = getSum(tokens)
 		}
 	}
-	println(tokens)
+	fmt.Println(sum)
 }
