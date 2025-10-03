@@ -71,6 +71,15 @@ The applications works from left to right and prioritises operations in the foll
 
 The priorities can naturally be changed using parentheses.
 
+
+## Updating
+Currently, there is no way of getting notified by the application if an update is available.
+Neither is this package available for any package manager.
+<br/>
+If you want to get notifications from GitHub, consider watching release activity for this repository.
+<br/>
+To update the program, repeat steps 1 to 3 from the installation instructions.
+
 ## Any problems?
 Please [open an issue](https://github.com/Lich-Corals/coral-ctc-terminal-calculator/issues) to get help and to help making this product better!
 
