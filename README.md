@@ -29,7 +29,7 @@ alias ctc="~/.local/bin/ctc"
 Fish users can add the following to their `~/.config/fish/fish.conf` file:
 ```fish
 function ctc
-    ~/.local/bin/ctc
+    ~/.local/bin/ctc $argv
 end
 ```
 <br/>
