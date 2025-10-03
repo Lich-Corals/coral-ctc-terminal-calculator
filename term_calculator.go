@@ -98,11 +98,9 @@ func getTokens(arg string) []token {
 
 	var grouped = makeGroups(ungrouped)
 
-	fmt.Println(grouped)
+	var sum = getSum(grouped)
 
-	var summed = getSum(grouped)
-
-	fmt.Println(summed)
+	fmt.Println(sum)
 
 	return ungrouped
 }
@@ -161,7 +159,6 @@ func getSum(tokens []token) float64 {
 						tok.sum = math.Pow(a.sum, b.sum)
 						tok.token = number
 						tok.priority = pX
-						fmt.Println(groups[other])
 						groups[other] = groups[other][:len(groups[other])-1]
 						groups[other] = append(groups[other], tok)
 						groups[other] = append(groups[other], groups[other][i:]...)
@@ -178,13 +175,37 @@ func getSum(tokens []token) float64 {
 						groups[other] = append(groups[other], groups[other][i:]...)
 						skip = true
 						r = false
+					case multiplication:
+						var a = groups[this][i-1]
+						var b = groups[this][i+1]
+						tok.sum = a.sum * b.sum
+						tok.token = number
+						tok.priority = pX
+						groups[other] = groups[other][:len(groups[other])-1]
+						groups[other] = append(groups[other], tok)
+						groups[other] = append(groups[other], groups[other][i:]...)
+						skip = true
+						r = false
+					case division:
+						var a = groups[this][i-1]
+						var b = groups[this][i+1]
+						if b.sum == 0.0 {
+							panic(fmt.Sprint("You can't divide by 0: ", a.sum, " / ", b.sum))
+						}
+						tok.sum = a.sum / b.sum
+						tok.token = number
+						tok.priority = pX
+						groups[other] = groups[other][:len(groups[other])-1]
+						groups[other] = append(groups[other], tok)
+						groups[other] = append(groups[other], groups[other][i:]...)
+						skip = true
+						r = false
 					}
 				} else {
 					if skip {
 						skip = false
 					} else {
 						groups[other] = append(groups[other], tok)
-						fmt.Println("Adding:", groups[other])
 					}
 				}
 			}
@@ -199,7 +220,6 @@ func getSum(tokens []token) float64 {
 				run = false
 			}
 		}
-		fmt.Println("Finished", pri, ":", groups[other])
 	}
 	return groups[other][0].sum
 }
