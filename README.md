@@ -40,6 +40,9 @@ The `ctc` command should be available in every newly launched terminal now.
 > You can use any path and any alias.
 > `~/.local/bin/ctc` and `ctc` are just the recommended options.
 
+> [!NOTE]   
+> To compile the code yourself, clone the repository and run `go build` in the directory.
+
 ## Usage
 ### Basic syntax
 The application runs with a single argument in quotes:
