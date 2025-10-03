@@ -69,9 +69,6 @@ type token struct {
 	content   []string
 	subTokens []token
 	sum       float64
-	a         float64
-	b         float64
-	used      bool
 }
 
 // Get tokens from input string
@@ -109,7 +106,7 @@ func getTokens(arg string) []token {
 	return ungrouped
 }
 
-// Add the sums to a list of tokens
+// calculate
 func getSum(tokens []token) []token {
 	var summed = []token{}
 	for _, tok := range tokens {
@@ -133,47 +130,135 @@ func getSum(tokens []token) []token {
 			summed = append(summed, tok)
 		}
 	}
-	for _, ee := range summed {
-		fmt.Println(ee.content, ee.sum)
-	}
 	var priorities = []tokenPriority{pA, pB, pC}
 	var group = summed
-	var groupA = []token{}
+	var groups = make([][]token, 2)
+	var this = 0
+	var other = 1
+	var modified = false
+	groups[this] = group
 	for _, pri := range priorities {
-		var skipIndex = -1
-		switch pri {
-		case pA:
-			for i, tok := range group {
-				if i != skipIndex {
+		var run = true
+		for run {
+			groups[other] = []token{}
+			var r = true
+			var skip = false
+			for i, tok := range groups[this] {
+				if tok.priority == pri && r {
 					switch tok.token {
 					case factorial:
-						var a = summed[i-1]
+						var a = groups[this][i-1]
 						tok.sum = fact(a.sum)
-						groupA = groupA[:len(groupA)-1]
-						groupA = append(groupA, tok)
+						tok.token = number
+						tok.priority = pX
+						groups[other] = groups[other][:len(groups[other])-1]        // Remove last object
+						groups[other] = append(groups[other], tok)                  // Add self in place of old object
+						groups[other] = append(groups[other], groups[other][i:]...) // Add everything after self
+						r = false
 					case power:
-						var a = summed[i-1]
-						var b = summed[i+1]
+						var a = groups[this][i-1]
+						var b = groups[this][i+1]
 						tok.sum = math.Pow(a.sum, b.sum)
-						groupA = groupA[:len(groupA)-1]
-						skipIndex = i + 1
-						fmt.Println(tok)
-						groupA = append(groupA, tok)
+						tok.token = number
+						tok.priority = pX
+						fmt.Println(groups[other])
+						groups[other] = groups[other][:len(groups[other])-1]
+						groups[other] = append(groups[other], tok)
+						groups[other] = append(groups[other], groups[other][i:]...)
+						skip = true
+						r = false
 					case root:
-						var a = summed[i-1]
-						var b = summed[i+1]
+						var a = groups[this][i-1]
+						var b = groups[this][i+1]
 						tok.sum = math.Pow(b.sum, 1.0/a.sum)
-						groupA = groupA[:len(groupA)-1]
-						skipIndex = i + 1
-						groupA = append(groupA, tok)
-					default:
-						groupA = append(groupA, tok)
+						tok.token = number
+						tok.priority = pX
+						groups[other] = groups[other][:len(groups[other])-1]
+						groups[other] = append(groups[other], tok)
+						groups[other] = append(groups[other], groups[other][i:]...)
+						skip = true
+						r = false
+					}
+				} else {
+					if skip {
+						skip = false
+					} else {
+						groups[other] = append(groups[other], tok)
+						fmt.Println("Adding:", groups[other])
 					}
 				}
 			}
+
+			this = other
+			if this == 1 {
+				other = 0
+			} else {
+				other = 1
+			}
+			if r {
+				run = false
+			}
 		}
+		fmt.Println("Finished", pri, ":", groups[other])
 	}
-	return groupA
+	return groups[other]
+	for _, pri := range priorities {
+		var run = true
+		for run {
+			switch pri {
+			case pA:
+				for i, tok := range groups[this] {
+					if !modified {
+						switch tok.token {
+						case factorial:
+							var a = summed[i-1]
+							tok.sum = fact(a.sum)
+							tok.token = number
+							groups[other] = groups[other][:len(groups[other])-1]        // Remove last object
+							groups[other] = append(groups[other], tok)                  // Add self in place of old object
+							groups[other] = append(groups[other], groups[other][i:]...) // Add everything after self
+							fmt.Println(groups[other])
+							modified = true
+						case power:
+							var a = summed[i-1]
+							var b = summed[i+1]
+							tok.sum = math.Pow(a.sum, b.sum)
+							tok.token = number
+							groups[other] = groups[other][:len(groups[other])-1]
+							groups[other] = append(groups[other], tok)
+							groups[other] = append(groups[other], groups[other][i+1:]...)
+							modified = true
+						case root:
+							var a = summed[i-1]
+							var b = summed[i+1]
+							tok.sum = math.Pow(b.sum, 1.0/a.sum)
+							tok.token = number
+							groups[other] = groups[other][:len(groups[other])-1]
+							groups[other] = append(groups[other], tok)
+							groups[other] = append(groups[other], groups[other][i+1:]...)
+							modified = true
+						default:
+							if len(groups[other]) == len(groups[this])-1 {
+								run = false
+							}
+							groups[other] = append(groups[other], tok)
+						}
+					} else {
+						break
+					}
+				}
+			}
+			modified = false
+			this = other
+			if this == 1 {
+				other = 0
+			} else {
+				other = 1
+			}
+		}
+		fmt.Println("Getting here", pri)
+	}
+	return groups[this]
 }
 
 // Find the factorial of a number
@@ -249,7 +334,7 @@ func processToken(part string) []token {
 	var tokens = []token{}
 	for _, part := range parts {
 		var tT, tP = getTokenTypeAndPriority(part)
-		tokens = append(tokens, token{token: tT, priority: tP, content: []string{part}, subTokens: nil, used: false})
+		tokens = append(tokens, token{token: tT, priority: tP, content: []string{part}, subTokens: nil})
 	}
 	return tokens
 }
