@@ -17,10 +17,10 @@
 // Testing with "2 * (3 + (2 + 6) * 4) + ( 2 // 9 ! ) + 200 ** 0 + -5 * (1 + 2) !"
 //
 // Priorities:
-// (X. numbers, factorials, groups)
-// A. powers, roots
-// B. multiplication and division
-// C. addition and substriction
+// (X. Numbers, factorials, groups)
+// A. Powers, roots
+// B. Multiplication and division
+// C. Addition and substraction
 //
 // Processing from left to right
 
