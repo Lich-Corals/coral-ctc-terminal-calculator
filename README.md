@@ -1,0 +1,67 @@
+## Coral-CTC
+### CTC terminal calculator
+
+CTC is a minimal and easy-to-use calculator application for your terminal.
+
+### Features
+Supported operations are the following:
+- addition
+- subtraction
+- multiplication
+- division
+- factorials
+- powers
+- roots
+- grouping with parentheses
+
+### Installation
+1. Download the binary `ctc` from the [latest release](https://github.com/Lich-Corals/coral-ctc-terminal-calculator/releases/latest).
+2. Place the file in a useful location (e.g. `~/.local/bin/ctc`)
+3. Make the file executable (e.g. `chmod +x ~/.local/bin/ctc`)
+4. Add an alias to your shells configuration file:
+Bash users can add the following line to their `.bashrc`:
+```bash
+alias ctc="~/.local/bin/ctc"
+```
+
+Fish users can add the following to their `~/.config/fish/fish.conf` file:
+```fish
+function ctc
+    ~/.local/bin/ctc
+end
+```
+<br/>
+
+The `ctc` command should be available in every newly launched terminal now.
+
+> [!TIP]   
+> You can use any path and any alias.
+> `~/.local/bin/ctc` and `ctc` are just the recommended options.
+
+### Usage
+#### Basic syntax
+The application runs with a single argument in quotes:
+```bash
+ctc "5 * 2 // 9 + 5.4 * 10"
+```
+This command takes the second root of 9 (`2 // 9`), multiplies it by 5 and adds 5.4 times 10 to it.
+
+Every part of the calculation must be separated by a space.
+The only exceptions are parentheses, which may be directly connected to a number (e.g. `(2 * 5)`).
+
+#### Priorities
+The applications works from left to right and prioritises operations in the following order:
+1. factorials
+2. roots and powers
+3. multiplication and division
+4. addition and subtraction
+
+The priorities can naturally be changed using parentheses.
+
+#### Unusual syntax
+To keep it simple, CTC does not support functions like `n.pow()` `sqrt()`.
+Instead, it has the `**` (power) and `//` (root) operators.
+The syntax is inspired by the syntax of the English language.
+Therefore, `2 ** 3` means _'2 to the 3'_ and `2 // 3` means _'the 2nd root of 3'_.
+
+All other operations are the usual ones, as used in programming languages or other calculators.
