@@ -17,7 +17,8 @@
 // Testing with "2 * (3 + (2 + 6) * 4) + ( 2 // 9 ! ) + 200 ** 0 + -5 * (1 + 2) !"
 //
 // Priorities:
-// A. powers, factorials, roots
+// (X. numbers, factorials, groups)
+// A. powers, roots
 // B. multiplication and division
 // C. addition and substriction
 //
@@ -107,7 +108,7 @@ func getTokens(arg string) []token {
 }
 
 // calculate
-func getSum(tokens []token) []token {
+func getSum(tokens []token) float64 {
 	var summed = []token{}
 	for _, tok := range tokens {
 		switch tok.token {
@@ -119,23 +120,32 @@ func getSum(tokens []token) []token {
 			tok.sum = val
 			summed = append(summed, tok)
 		case openDelim:
-			tok.subTokens = getSum(tok.subTokens)
-			var sum = 0.0
-			for _, sT := range tok.subTokens {
-				sum += sT.sum
-			}
-			tok.sum = sum
+			tok.sum = getSum(tok.subTokens)
 			summed = append(summed, tok)
 		default:
 			summed = append(summed, tok)
 		}
 	}
+	var withFactorials = []token{}
+	for i, tok := range summed {
+		if tok.token == factorial {
+			if len(decimalNumberRegex.FindAllString(tok.content[0], -1)) != 0 {
+				panic(fmt.Sprint("Factorial numbers can't be based on decimal numbers:", tok.content[0]))
+			}
+			tok.token = number
+			tok.priority = pX
+			tok.sum = fact(summed[i-1].sum)
+			withFactorials = withFactorials[:i-1]
+			withFactorials = append(withFactorials, tok)
+		} else {
+			withFactorials = append(withFactorials, tok)
+		}
+	}
 	var priorities = []tokenPriority{pA, pB, pC}
-	var group = summed
 	var groups = make([][]token, 2)
 	var this = 0
 	var other = 1
-	groups[this] = group
+	groups[this] = withFactorials
 	for _, pri := range priorities {
 		var run = true
 		for run {
@@ -145,15 +155,6 @@ func getSum(tokens []token) []token {
 			for i, tok := range groups[this] {
 				if tok.priority == pri && r {
 					switch tok.token {
-					case factorial:
-						var a = groups[this][i-1]
-						tok.sum = fact(a.sum)
-						tok.token = number
-						tok.priority = pX
-						groups[other] = groups[other][:len(groups[other])-1]        // Remove last object
-						groups[other] = append(groups[other], tok)                  // Add self in place of old object
-						groups[other] = append(groups[other], groups[other][i:]...) // Add everything after self
-						r = false
 					case power:
 						var a = groups[this][i-1]
 						var b = groups[this][i+1]
@@ -200,7 +201,7 @@ func getSum(tokens []token) []token {
 		}
 		fmt.Println("Finished", pri, ":", groups[other])
 	}
-	return groups[other]
+	return groups[other][0].sum
 }
 
 // Find the factorial of a number
