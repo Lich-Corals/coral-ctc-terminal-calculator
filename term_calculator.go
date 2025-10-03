@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public Licence
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Testing with "2 * (3 + (2 + 6) * 4) + ( 2 // 9 ! ) + 200 ** 0 + -5 * (1 + 2) !"
+// Testing with "2 * (3 + (2 + 6.1) * 4) + ( 2 // 9 ! ) + 200 ** 0 + -5 * (1 + 2) !"
 //
 // Priorities:
 // (X. Numbers, factorials, groups)
@@ -196,6 +196,28 @@ func getSum(tokens []token) float64 {
 							panic(fmt.Sprint("You can't divide by 0: ", a.sum, " / ", b.sum))
 						}
 						tok.sum = a.sum / b.sum
+						tok.token = number
+						tok.priority = pX
+						groups[other] = groups[other][:len(groups[other])-1]
+						groups[other] = append(groups[other], tok)
+						groups[other] = append(groups[other], groups[other][i:]...)
+						skip = true
+						r = false
+					case addition:
+						var a = groups[this][i-1]
+						var b = groups[this][i+1]
+						tok.sum = a.sum + b.sum
+						tok.token = number
+						tok.priority = pX
+						groups[other] = groups[other][:len(groups[other])-1]
+						groups[other] = append(groups[other], tok)
+						groups[other] = append(groups[other], groups[other][i:]...)
+						skip = true
+						r = false
+					case subtraction:
+						var a = groups[this][i-1]
+						var b = groups[this][i+1]
+						tok.sum = a.sum - b.sum
 						tok.token = number
 						tok.priority = pX
 						groups[other] = groups[other][:len(groups[other])-1]
