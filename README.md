@@ -1,9 +1,11 @@
-## Coral-CTC
-### CTC terminal calculator
+# Coral-CTC
+## CTC terminal calculator
+[![GitHub](https://img.shields.io/badge/-GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white)](https://github.com/Lich-Corals/coral-ctc-terminal-calculator)
+[![Coffee Logo](https://img.shields.io/badge/-Buy%20me%20a%20coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black)](https://www.coff.ee/lichcorals)
 
 CTC is a minimal and easy-to-use calculator application for your terminal.
 
-### Features
+## Features
 Supported operations are the following:
 - addition
 - subtraction
@@ -14,7 +16,7 @@ Supported operations are the following:
 - roots
 - grouping with parentheses
 
-### Installation
+## Installation
 1. Download the binary `ctc` from the [latest release](https://github.com/Lich-Corals/coral-ctc-terminal-calculator/releases/latest).
 2. Place the file in a useful location (e.g. `~/.local/bin/ctc`)
 3. Make the file executable (e.g. `chmod +x ~/.local/bin/ctc`)
@@ -38,8 +40,8 @@ The `ctc` command should be available in every newly launched terminal now.
 > You can use any path and any alias.
 > `~/.local/bin/ctc` and `ctc` are just the recommended options.
 
-### Usage
-#### Basic syntax
+## Usage
+### Basic syntax
 The application runs with a single argument in quotes:
 ```bash
 ctc "5 * 2 // 9 + 5.4 * 10"
@@ -49,7 +51,15 @@ This command takes the second root of 9 (`2 // 9`), multiplies it by 5 and adds 
 Every part of the calculation must be separated by a space.
 The only exceptions are parentheses, which may be directly connected to a number (e.g. `(2 * 5)`).
 
-#### Priorities
+### Unusual syntax
+To keep it simple, CTC does not support functions like `n.pow()` `sqrt()`.
+Instead, it has the `**` (power) and `//` (root) operators.
+The syntax is inspired by the syntax of the English language.
+Therefore, `2 ** 3` means _'2 to the 3'_ and `2 // 3` means _'the 2nd root of 3'_.
+
+All other operations are the usual ones, as used in programming languages or other calculators.
+
+### Priorities
 The applications works from left to right and prioritises operations in the following order:
 1. factorials
 2. roots and powers
@@ -58,10 +68,9 @@ The applications works from left to right and prioritises operations in the foll
 
 The priorities can naturally be changed using parentheses.
 
-#### Unusual syntax
-To keep it simple, CTC does not support functions like `n.pow()` `sqrt()`.
-Instead, it has the `**` (power) and `//` (root) operators.
-The syntax is inspired by the syntax of the English language.
-Therefore, `2 ** 3` means _'2 to the 3'_ and `2 // 3` means _'the 2nd root of 3'_.
+## Any problems?
+Please [open an issue](https://github.com/Lich-Corals/coral-ctc-terminal-calculator/issues) to get help and to help making this product better!
 
-All other operations are the usual ones, as used in programming languages or other calculators.
+
+## Contributing
+You are welcome to contribute to this project in any way. Take a look at the [contribution guidelines](https://github.com/Lich-Corals/coral-ctc-terminal-calculator?tab=contributing-ov-file) for more information.
