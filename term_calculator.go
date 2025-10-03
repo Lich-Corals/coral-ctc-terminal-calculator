@@ -135,7 +135,6 @@ func getSum(tokens []token) []token {
 	var groups = make([][]token, 2)
 	var this = 0
 	var other = 1
-	var modified = false
 	groups[this] = group
 	for _, pri := range priorities {
 		var run = true
@@ -202,63 +201,6 @@ func getSum(tokens []token) []token {
 		fmt.Println("Finished", pri, ":", groups[other])
 	}
 	return groups[other]
-	for _, pri := range priorities {
-		var run = true
-		for run {
-			switch pri {
-			case pA:
-				for i, tok := range groups[this] {
-					if !modified {
-						switch tok.token {
-						case factorial:
-							var a = summed[i-1]
-							tok.sum = fact(a.sum)
-							tok.token = number
-							groups[other] = groups[other][:len(groups[other])-1]        // Remove last object
-							groups[other] = append(groups[other], tok)                  // Add self in place of old object
-							groups[other] = append(groups[other], groups[other][i:]...) // Add everything after self
-							fmt.Println(groups[other])
-							modified = true
-						case power:
-							var a = summed[i-1]
-							var b = summed[i+1]
-							tok.sum = math.Pow(a.sum, b.sum)
-							tok.token = number
-							groups[other] = groups[other][:len(groups[other])-1]
-							groups[other] = append(groups[other], tok)
-							groups[other] = append(groups[other], groups[other][i+1:]...)
-							modified = true
-						case root:
-							var a = summed[i-1]
-							var b = summed[i+1]
-							tok.sum = math.Pow(b.sum, 1.0/a.sum)
-							tok.token = number
-							groups[other] = groups[other][:len(groups[other])-1]
-							groups[other] = append(groups[other], tok)
-							groups[other] = append(groups[other], groups[other][i+1:]...)
-							modified = true
-						default:
-							if len(groups[other]) == len(groups[this])-1 {
-								run = false
-							}
-							groups[other] = append(groups[other], tok)
-						}
-					} else {
-						break
-					}
-				}
-			}
-			modified = false
-			this = other
-			if this == 1 {
-				other = 0
-			} else {
-				other = 1
-			}
-		}
-		fmt.Println("Getting here", pri)
-	}
-	return groups[this]
 }
 
 // Find the factorial of a number
