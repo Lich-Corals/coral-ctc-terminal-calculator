@@ -112,13 +112,10 @@ func getSum(tokens []token) float64 {
 				panic(fmt.Sprint("Cannot convert to number: ", tok.content[0]))
 			}
 			tok.sum = val
-			summed = append(summed, tok)
 		case openDelim:
 			tok.sum = getSum(tok.subTokens) // Calculates bracket-contents recursively
-			summed = append(summed, tok)
-		default:
-			summed = append(summed, tok)
 		}
+		summed = append(summed, tok)
 	}
 	// Faculties are converted into numbers before any other calculations start
 	var withFactorials = []token{}
@@ -134,10 +131,8 @@ func getSum(tokens []token) float64 {
 			tok.priority = pX
 			tok.sum = fact(summed[i-1].sum)
 			withFactorials = withFactorials[:i-1]
-			withFactorials = append(withFactorials, tok)
-		} else {
-			withFactorials = append(withFactorials, tok)
 		}
+		withFactorials = append(withFactorials, tok)
 	}
 	var priorities = []tokenPriority{pA, pB, pC}
 	var groups = make([][]token, 2)
