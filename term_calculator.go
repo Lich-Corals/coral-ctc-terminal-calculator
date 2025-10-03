@@ -36,8 +36,8 @@ import (
 )
 
 var (
-	numberRegex        = regexp.MustCompile(`^-{0,1}\d+(?:,\d+){0,1}$`)
-	decimalNumberRegex = regexp.MustCompile(`^-{0,1}\d+,\d+$`)
+	numberRegex        = regexp.MustCompile(`^-{0,1}\d+(?:\.\d+){0,1}$`)
+	decimalNumberRegex = regexp.MustCompile(`^-{0,1}\d+\.\d+$`)
 )
 
 type tokenType int8
@@ -127,8 +127,11 @@ func getSum(tokens []token) float64 {
 	var withFactorials = []token{}
 	for i, tok := range summed {
 		if tok.token == factorial {
-			if len(decimalNumberRegex.FindAllString(tok.content[0], -1)) != 0 {
-				panic(fmt.Sprint("Factorial numbers can't be based on decimal numbers:", tok.content[0]))
+			if len(decimalNumberRegex.FindAllString(summed[i-1].content[0], -1)) != 0 {
+				panic(fmt.Sprint("Factorial numbers can't be based on decimal numbers: ", summed[i-1].sum, " !"))
+			}
+			if summed[i-1].sum < 0 {
+				panic(fmt.Sprint("You can't get the factorial of a negative number: ", summed[i-1].sum, " !"))
 			}
 			tok.token = number
 			tok.priority = pX
