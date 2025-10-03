@@ -35,6 +35,9 @@ import (
 	"strings"
 )
 
+// The current package version
+const pkgVersion = "0.1.0"
+
 var (
 	numberRegex        = regexp.MustCompile(`^-{0,1}\d+(?:\.\d+){0,1}$`)
 	decimalNumberRegex = regexp.MustCompile(`^-{0,1}\d+\.\d+$`)
@@ -331,6 +334,14 @@ func main() {
 		quitWithError("Missing an argument!")
 	} else if len(terminalArguments) > 2 {
 		quitWithError("Too many arguments!")
+	}
+	switch terminalArguments[1] {
+	case "--licence", "--license":
+		println(ansiBlue, "\nCoral-CTC-Terminal-Calculator  Copyright (C) 2025  Linus Tibert\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions. You can view the licence here:\nhttps://github.com/Lich-Corals/coral-ctc-terminal-calculator/blob/mistress/LICENCE\n", ansiReset)
+		os.Exit(0)
+	case "--version":
+		println(ansiBlue, pkgVersion, ansiReset)
+		os.Exit(0)
 	}
 	for i, v := range terminalArguments {
 		if i == len(terminalArguments)-1 { // Use the last argument to get operations
