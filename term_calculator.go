@@ -20,7 +20,7 @@
 // (X. Numbers, factorials, groups)
 // A. Powers, roots
 // B. Multiplication and division
-// C. Addition and substraction
+// C. Addition and subtraction
 //
 // Processing from left to right
 
@@ -47,7 +47,7 @@ const (
 	unknownTokenType tokenType = iota
 	number
 	addition
-	substraction
+	subtraction
 	multiplication
 	division
 	power
@@ -291,7 +291,7 @@ func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
 		case "+":
 			return addition, pC
 		case "-":
-			return substraction, pC
+			return subtraction, pC
 		case "*":
 			return multiplication, pB
 		case "/":
