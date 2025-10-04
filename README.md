@@ -3,7 +3,8 @@
 [![Coffee Logo](https://img.shields.io/badge/-Buy%20me%20a%20coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black)](https://www.coff.ee/lichcorals)
 
 ## CTC terminal calculator
-CTC is a minimal and easy-to-use calculator application for your terminal.
+CTC is a minimal and easy-to-use calculator application for your terminal.<br/>
+This project is meant for people who are quick with terminal applications, who may want a replacement for a GUI calculator.
 
 ## Features
 Supported operations are the following:
