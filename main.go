@@ -85,7 +85,7 @@ type token struct {
 }
 
 // Get tokens from input string
-func getTokens(arg string) []token {
+func GetTokens(arg string) []token {
 	var ungrouped = []token{}
 	for tok := range strings.SplitSeq(arg, " ") {
 		for _, t := range processToken(tok) {
@@ -114,7 +114,7 @@ func getTokens(arg string) []token {
 }
 
 // calculate
-func getSum(tokens []token) float64 {
+func GetSum(tokens []token) float64 {
 	var summed = []token{}
 	for _, tok := range tokens {
 		switch tok.token {
@@ -125,7 +125,7 @@ func getSum(tokens []token) float64 {
 			}
 			tok.sum = val
 		case openDelim:
-			tok.sum = getSum(tok.subTokens) // Calculates parenthesized-contents recursively
+			tok.sum = GetSum(tok.subTokens) // Calculates parenthesized-contents recursively
 		}
 		summed = append(summed, tok)
 	}
@@ -357,8 +357,8 @@ func main() {
 	}
 	for i, v := range terminalArguments {
 		if i == len(terminalArguments)-1 { // Use the last argument to get operations
-			tokens = getTokens(v)
-			sum = getSum(tokens)
+			tokens = GetTokens(v)
+			sum = GetSum(tokens)
 		}
 	}
 	fmt.Println(sum)
