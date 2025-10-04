@@ -37,7 +37,7 @@ import (
 )
 
 // The current package version
-const pkgVersion = "0.1.0"
+const pkgVersion = "0.2.0"
 
 var (
 	numberRegex        = regexp.MustCompile(`^-{0,1}\d+(?:\.\d+){0,1}$`)
