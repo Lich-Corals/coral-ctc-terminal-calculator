@@ -14,12 +14,13 @@
 // You should have received a copy of the GNU Affero General Public Licence
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Testing with "2 * (3 + (2 + 6.1) * 4) + ( 2 // 9 ! ) + 200 ** 0 + -5 * (1 + 2) !"
+// Testing with "2 * (3 + (2 + 6.1) * 4) + ( 2 // 9 ! ) + 200 ** 0 + -5 * (1 + 2) ! + 5 % 2"
+// Should return 645.1952191045343
 //
 // Priorities:
 // (X. Numbers, factorials, groups)
 // A. Powers, roots
-// B. Multiplication and division
+// B. Multiplication, division and modulo
 // C. Addition and subtraction
 //
 // Processing from left to right
@@ -56,6 +57,7 @@ const (
 	power
 	root
 	factorial
+	modulo
 	openDelim
 	closeDelim
 )
@@ -177,6 +179,11 @@ func getSum(tokens []token) float64 {
 							}
 						}
 						tok.sum = a.sum / b.sum
+					case modulo:
+						if len(decimalNumberRegex.FindAllString(a.content[0], -1)) != 0.0 || len(decimalNumberRegex.FindAllString(b.content[0], -1)) != 0 {
+							quitWithError(fmt.Sprint("Cannot perform modulo on float values: ", a.content, "%", b.content))
+						}
+						tok.sum = float64(int(a.sum) % int(b.sum))
 					case addition:
 						tok.sum = a.sum + b.sum
 					case subtraction:
@@ -309,6 +316,8 @@ func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
 			return root, pA
 		case "!":
 			return factorial, pA
+		case "%":
+			return modulo, pB
 		case "(":
 			return openDelim, pX
 		case ")":
