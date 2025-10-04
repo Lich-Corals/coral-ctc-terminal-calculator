@@ -14,6 +14,7 @@ Supported operations are the following:
 - factorials
 - powers
 - roots
+- modulo
 - grouping with parentheses
 
 ## Installation
@@ -60,13 +61,16 @@ Instead, it has the `**` (power) and `//` (root) operators.
 The syntax is inspired by the syntax of the English language.
 Therefore, `2 ** 3` means _'2 to the 3'_ and `2 // 3` means _'the 2nd root of 3'_.
 
+Additionally, there is the `%` (modulo) operator, which is used like _'x mod y'_.
+This doesn't differ from the way it is implemented in many modern programming languages.
+
 All other operations are the usual ones, as used in programming languages or other calculators.
 
 ### Priorities
 The applications works from left to right and prioritises operations in the following order:
 1. factorials
 2. roots and powers
-3. multiplication and division
+3. multiplication, division and modulo
 4. addition and subtraction
 
 The priorities can naturally be changed using parentheses.
