@@ -181,7 +181,7 @@ func getSum(tokens []token) float64 {
 						tok.sum = a.sum / b.sum
 					case modulo:
 						if len(decimalNumberRegex.FindAllString(a.content[0], -1)) != 0.0 || len(decimalNumberRegex.FindAllString(b.content[0], -1)) != 0 {
-							quitWithError(fmt.Sprint("Cannot perform modulo on float values: ", a.content, "%", b.content))
+							quitWithError(fmt.Sprint("Cannot perform modulo on float values: ", a.sum, " % ", b.sum))
 						}
 						tok.sum = float64(int(a.sum) % int(b.sum))
 					case addition:
@@ -214,6 +214,9 @@ func getSum(tokens []token) float64 {
 				run = false
 			}
 		}
+	}
+	if len(groups[other]) > 1 {
+		quitWithError(fmt.Sprint("Too many calculation results: ", groups[other][0].sum, " ", groups[other][1].sum, "\nMaybe you forgot an operator?"))
 	}
 	return groups[other][0].sum
 }
