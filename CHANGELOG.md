@@ -1,3 +1,7 @@
+## [0.3.1]
+### Added
+- Logarithmic functions
+
 ## [0.3.0]
 ### Added
 - continuous mode for continuous and faster usage

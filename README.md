@@ -81,7 +81,7 @@ The applications works from left to right and prioritises operations in the foll
 1. factorials
 2. roots and powers
 3. multiplication, division and modulo
-4. addition and subtraction
+4. addition, subtraction and logarithms
 
 The priorities can naturally be changed using parentheses.
 
