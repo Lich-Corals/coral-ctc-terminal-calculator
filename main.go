@@ -395,15 +395,15 @@ func main() {
 		fmt.Println(sum)
 	case continuous:
 		showLicence()
-		run := true
-		for run {
+		for true {
 			fmt.Print("> ")
-			reader := bufio.NewReader(os.Stdin)
-			line, err := reader.ReadString('\n')
+			scanner := bufio.NewScanner(os.Stdin)
+			scanner.Scan()
+			err := scanner.Err()
 			if err != nil {
 				log.Fatal(err)
 			}
-			line = strings.Replace(line, "\n", "", 1)
+			line := scanner.Text()
 			switch line {
 			case ":q", "exit", "exit()":
 				os.Exit(0)
