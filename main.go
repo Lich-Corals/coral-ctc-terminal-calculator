@@ -28,7 +28,9 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"log"
 	"math"
 	"os"
 	"regexp"
@@ -39,6 +41,12 @@ import (
 // The current package version
 const pkgVersion = "0.2.0"
 
+// Global variables
+var (
+	currentInputMode   = noInuputMode
+	calculationSuccess = true
+)
+
 var (
 	numberRegex        = regexp.MustCompile(`^-{0,1}\d+(?:\.\d+){0,1}$`)
 	decimalNumberRegex = regexp.MustCompile(`^-{0,1}\d+\.\d+$`)
@@ -46,6 +54,14 @@ var (
 
 type tokenType int8
 type tokenPriority int8
+type inputMode int8
+
+// Input mode mostly determines whether there is an argument; if there are none, continuous mode will be used.
+const (
+	noInuputMode inputMode = iota
+	single
+	continuous
+)
 
 const (
 	unknownTokenType tokenType = iota
@@ -103,9 +119,9 @@ func GetTokens(arg string) []token {
 		}
 	}
 	if brS < 0 {
-		quitWithError("Unmatched ')'")
+		userError("Unmatched ')'")
 	} else if brS > 0 {
-		quitWithError("Unmatched '('")
+		userError("Unmatched '('")
 	}
 
 	var grouped = makeGroups(ungrouped)
@@ -121,7 +137,7 @@ func GetSum(tokens []token) float64 {
 		case number:
 			val, err := strconv.ParseFloat(tok.content[0], 64)
 			if err != nil {
-				quitWithError(fmt.Sprint("Cannot convert to number: ", tok.content[0]))
+				userError(fmt.Sprint("Cannot convert to number: ", tok.content[0]))
 			}
 			tok.sum = val
 		case openDelim:
@@ -134,10 +150,10 @@ func GetSum(tokens []token) float64 {
 	for i, tok := range summed {
 		if tok.token == factorial {
 			if len(decimalNumberRegex.FindAllString(summed[i-1].content[0], -1)) != 0 {
-				quitWithError(fmt.Sprint("Factorial numbers can't be based on decimal numbers: ", summed[i-1].sum, " !"))
+				userError(fmt.Sprint("Factorial numbers can't be based on decimal numbers: ", summed[i-1].sum, " !"))
 			}
 			if summed[i-1].sum < 0 {
-				quitWithError(fmt.Sprint("You can't get the factorial of a negative number: ", summed[i-1].sum, " !"))
+				userError(fmt.Sprint("You can't get the factorial of a negative number: ", summed[i-1].sum, " !"))
 			}
 			tok.token = number
 			tok.priority = pX
@@ -175,13 +191,13 @@ func GetSum(tokens []token) float64 {
 								println(ansiRed, fmt.Sprint("You can't divide by 0: ", a.sum, " / ", b.sum), ansiBlue, "\nNever gonna give you up!\nNever gonna let you down\n...", ansiReset)
 								os.Exit(69)
 							} else {
-								quitWithError(fmt.Sprint("You can't divide by 0: ", a.sum, " / ", b.sum))
+								userError(fmt.Sprint("You can't divide by 0: ", a.sum, " / ", b.sum))
 							}
 						}
 						tok.sum = a.sum / b.sum
 					case modulo:
 						if len(decimalNumberRegex.FindAllString(a.content[0], -1)) != 0.0 || len(decimalNumberRegex.FindAllString(b.content[0], -1)) != 0 {
-							quitWithError(fmt.Sprint("Cannot perform modulo on float values: ", a.sum, " % ", b.sum))
+							userError(fmt.Sprint("Cannot perform modulo on float values: ", a.sum, " % ", b.sum))
 						}
 						tok.sum = float64(int(a.sum) % int(b.sum))
 					case addition:
@@ -216,7 +232,7 @@ func GetSum(tokens []token) float64 {
 		}
 	}
 	if len(groups[other]) > 1 {
-		quitWithError(fmt.Sprint("Too many calculation results: ", groups[other][0].sum, " ", groups[other][1].sum, "\nMaybe you forgot an operator?"))
+		userError(fmt.Sprint("Too many calculation results: ", groups[other][0].sum, " ", groups[other][1].sum, "\nMaybe you forgot an operator?"))
 	}
 	return groups[other][0].sum
 }
@@ -265,7 +281,7 @@ func getSubTokens(part string) []string {
 	var retVal = []string{}
 	var s = false
 	if strings.Contains(part, ")") && strings.Contains(part, "(") {
-		quitWithError(fmt.Sprint("One token may never contain both '(' and ')': ", part))
+		userError(fmt.Sprint("One token may never contain both '(' and ')': ", part))
 	}
 	if strings.Contains(part, "(") {
 		s = true
@@ -327,39 +343,79 @@ func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
 			return closeDelim, pX
 		}
 	}
-	quitWithError(fmt.Sprint("Unknown token: ", content))
+	userError(fmt.Sprint("Unknown token: ", content))
 	return unknownTokenType, pX
 }
 
 // Show an error to the user
-func quitWithError(content string) {
-	println(ansiRed, content, ansiReset)
-	println(ansiBlue, "If you believe this is a bug, please open an issue: https://github.com/Lich-Corals/coral-ctc-terminal-calculator/issues", ansiReset)
-	os.Exit(1)
+func userError(content string) {
+	if calculationSuccess {
+		println(ansiRed, content, ansiReset)
+		println(ansiBlue, "If you believe this is a bug, please open an issue: https://github.com/Lich-Corals/coral-ctc-terminal-calculator/issues", ansiReset)
+
+	}
+	switch currentInputMode {
+	case single:
+		os.Exit(1)
+	case continuous:
+		calculationSuccess = false
+	}
+}
+
+// Show a licence notice to the user
+func showLicence() {
+	println(ansiBlue, "\nCoral-CTC-Terminal-Calculator  Copyright (C) 2025  Linus Tibert\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions. You can view the licence here:\nhttps://github.com/Lich-Corals/coral-ctc-terminal-calculator/blob/mistress/LICENCE\n", ansiReset)
+
 }
 
 func main() {
 	var terminalArguments = os.Args
 	var tokens []token
 	var sum float64
-	if len(terminalArguments) < 2 {
-		quitWithError("Missing an argument!")
+	if len(terminalArguments) == 1 {
+		currentInputMode = continuous
 	} else if len(terminalArguments) > 2 {
-		quitWithError("Too many arguments!")
+		userError("Too many arguments!")
+	} else {
+		currentInputMode = single
 	}
-	switch terminalArguments[1] {
-	case "--licence", "--license":
-		println(ansiBlue, "\nCoral-CTC-Terminal-Calculator  Copyright (C) 2025  Linus Tibert\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions. You can view the licence here:\nhttps://github.com/Lich-Corals/coral-ctc-terminal-calculator/blob/mistress/LICENCE\n", ansiReset)
-		os.Exit(0)
-	case "--version":
-		println(ansiBlue, pkgVersion, ansiReset)
-		os.Exit(0)
-	}
-	for i, v := range terminalArguments {
-		if i == len(terminalArguments)-1 { // Use the last argument to get operations
-			tokens = GetTokens(v)
-			sum = GetSum(tokens)
+	switch currentInputMode {
+	case single:
+		switch terminalArguments[1] {
+		case "--licence", "--license":
+			showLicence()
+			os.Exit(0)
+		case "--version":
+			println(ansiBlue, pkgVersion, ansiReset)
+			os.Exit(0)
 		}
+
+		tokens = GetTokens(terminalArguments[len(terminalArguments)-1])
+		sum = GetSum(tokens)
+		fmt.Println(sum)
+	case continuous:
+		showLicence()
+		run := true
+		for run {
+			fmt.Print("> ")
+			reader := bufio.NewReader(os.Stdin)
+			line, err := reader.ReadString('\n')
+			if err != nil {
+				log.Fatal(err)
+			}
+			line = strings.Replace(line, "\n", "", 1)
+			switch line {
+			case ":q", "exit", "exit()":
+				os.Exit(0)
+			}
+			tokens := GetTokens(line)
+			sum := GetSum(tokens)
+			if calculationSuccess {
+				fmt.Println(sum)
+			} else {
+				calculationSuccess = true
+			}
+		}
+
 	}
-	fmt.Println(sum)
 }
