@@ -53,6 +53,15 @@ ctc "5 * 2 // 9 + 5.4 * 10"
 ```
 This command takes the second root of 9 (`2 // 9`), multiplies it by 5 and adds 5.4 times 10 to it.
 
+CTC also has a continuous mode:
+```bash
+$ ctc
+> 1 + 1
+2
+> exit
+```
+The mode can be exited by sending a `exit`, `:q`, `exit()`, or by pressing ctrl+c.
+
 Every part of the calculation must be separated by a space.
 The only exceptions are parentheses, which may be directly connected to a number (e.g. `(2 * 5)`).
 
