@@ -416,6 +416,5 @@ func main() {
 				calculationSuccess = true
 			}
 		}
-
 	}
 }
