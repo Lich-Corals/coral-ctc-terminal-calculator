@@ -39,7 +39,7 @@ import (
 )
 
 // The current package version
-const pkgVersion = "0.2.0"
+const pkgVersion = "0.3.0"
 
 // Global variables
 var (
@@ -389,7 +389,6 @@ func main() {
 			println(ansiBlue, pkgVersion, ansiReset)
 			os.Exit(0)
 		}
-
 		tokens = GetTokens(terminalArguments[len(terminalArguments)-1])
 		sum = GetSum(tokens)
 		fmt.Println(sum)
