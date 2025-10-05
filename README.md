@@ -16,6 +16,7 @@ Supported operations are the following:
 - powers
 - roots
 - modulo
+- logarithms
 - grouping with parentheses
 
 ## Installation
@@ -71,8 +72,7 @@ Instead, it has the `**` (power) and `//` (root) operators.
 The syntax is inspired by the syntax of the English language.
 Therefore, `2 ** 3` means _'2 to the 3'_ and `2 // 3` means _'the 2nd root of 3'_.
 
-Additionally, there is the `%` (modulo) operator, which is used like _'x mod y'_.
-This doesn't differ from the way it is implemented in many modern programming languages.
+Additionally, there is the `%` (modulo) operator, which is used like _'x mod y'_, and the `log` operator to get the logarithm of _x to the base y_ (`x log y`).
 
 All other operations are the usual ones, as used in programming languages or other calculators.
 

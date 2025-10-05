@@ -21,7 +21,7 @@
 // (X. Numbers, factorials, groups)
 // A. Powers, roots
 // B. Multiplication, division and modulo
-// C. Addition and subtraction
+// C. Addition, subtraction and logarithms
 //
 // Processing from left to right
 
@@ -74,6 +74,7 @@ const (
 	root
 	factorial
 	modulo
+	logarithm
 	openDelim
 	closeDelim
 )
@@ -200,6 +201,11 @@ func GetSum(tokens []token) float64 {
 							userError(fmt.Sprint("Cannot perform modulo on float values: ", a.sum, " % ", b.sum))
 						}
 						tok.sum = float64(int(a.sum) % int(b.sum))
+					case logarithm:
+						if a.sum == 0 || b.sum == 0 {
+							userError(fmt.Sprint("Logarithm with zero as base or x: ", a.sum, " log ", b.sum))
+						}
+						tok.sum = math.Log(a.sum) / math.Log(b.sum)
 					case addition:
 						tok.sum = a.sum + b.sum
 					case subtraction:
@@ -337,6 +343,8 @@ func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
 			return factorial, pA
 		case "%":
 			return modulo, pB
+		case "log":
+			return logarithm, pC
 		case "(":
 			return openDelim, pX
 		case ")":
