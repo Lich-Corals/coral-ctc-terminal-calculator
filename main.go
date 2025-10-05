@@ -31,6 +31,7 @@ import (
 	"math"
 	"os"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -45,8 +46,9 @@ var (
 )
 
 var (
-	numberRegex        = regexp.MustCompile(`^-{0,1}\d+(?:\.\d+){0,1}$`)
-	decimalNumberRegex = regexp.MustCompile(`^-{0,1}\d+\.\d+$`)
+	numberRegex                 = regexp.MustCompile(`^-{0,1}\d+(?:\.\d+){0,1}$`)
+	decimalNumberRegex          = regexp.MustCompile(`^-{0,1}\d+\.\d+$`)
+	constants          []string = []string{"pi", "tau", "e"}
 )
 
 type tokenType int8
@@ -72,6 +74,7 @@ const (
 	factorial
 	modulo
 	logarithm
+	constant
 	openDelim
 	closeDelim
 )
@@ -313,6 +316,21 @@ func processToken(part string) []token {
 	var tokens = []token{}
 	for _, part := range parts {
 		var tT, tP = getTokenTypeAndPriority(part)
+		if tT == constant {
+			tT = number
+			nP := 0.0
+			switch part {
+			case "pi":
+				nP = math.Pi
+			case "tau":
+				nP = math.Pi * 2
+			case "e":
+				nP = math.E
+			default:
+				userError(fmt.Sprint("Constant not defined: ", part, "\nThis looks like a bug; please report."))
+			}
+			part = fmt.Sprintf("%f", nP)
+		}
 		tokens = append(tokens, token{token: tT, priority: tP, content: []string{part}, subTokens: nil})
 	}
 	return tokens
@@ -322,6 +340,8 @@ func processToken(part string) []token {
 func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
 	if len(numberRegex.FindAllString(content, -1)) == 1 {
 		return number, pX
+	} else if slices.Contains(constants, content) {
+		return constant, pX
 	} else {
 		switch content {
 		case "+":
