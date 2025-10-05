@@ -14,9 +14,6 @@
 // You should have received a copy of the GNU Affero General Public Licence
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Testing with "2 * (3 + (2 + 6.1) * 4) + ( 2 // 9 ! ) + 200 ** 0 + -5 * (1 + 2) ! + 5 % 2"
-// Should return 645.1952191045343
-//
 // Priorities:
 // (X. Numbers, factorials, groups)
 // A. Powers, roots
