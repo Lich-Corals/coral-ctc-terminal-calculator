@@ -188,16 +188,35 @@ func GetSum(tokens []token) float64 {
 			var skip = false
 			for i, tok := range groups[this] {
 				if tok.priority == pri && ru {
-					var a token
-					var b token
+					var a = tok
+					var b = tok
+					var missingArg = false
 					switch tok.neededArgs {
 					case leftRight:
-						a = groups[this][i-1]
-						b = groups[this][i+1]
+						if i-1 >= 0 && i+1 < len(groups[this]) {
+							a = groups[this][i-1]
+							b = groups[this][i+1]
+						} else {
+							missingArg = true
+						}
 					case left:
-						a = groups[this][i-1]
+						if i-1 >= 0 {
+							a = groups[this][i-1]
+						} else {
+							missingArg = true
+						}
 					case right:
-						b = groups[this][i+1]
+						if i+1 < len(groups[this]) {
+							b = groups[this][i+1]
+						} else {
+							missingArg = true
+						}
+					}
+					if missingArg {
+						userError(fmt.Sprintf("Operator at index %v missing argument(s): %s\nNote: The first index is 0", i, tok.content[0]))
+						groups[other] = append(groups[other], tok) // Those add dummy arguments to avoid panics in the following code;
+						groups[other] = append(groups[other], tok) // The result will not be visible anyway.
+						run = false
 					}
 					tok.priority = pX
 					switch tok.token {
@@ -258,18 +277,20 @@ func GetSum(tokens []token) float64 {
 						tok.sum = math.Tan(degreesToRadians(b.sum))
 					}
 					tok.token = number
-					switch tok.neededArgs {
-					case leftRight:
-						groups[other] = groups[other][:len(groups[other])-1]        // Pop a
-						groups[other] = append(groups[other], tok)                  // Insert self at a's place
-						groups[other] = append(groups[other], groups[other][i:]...) // Add everything after b
-					case right:
-						groups[other] = append(groups[other], tok)                    // Add self
-						groups[other] = append(groups[other], groups[other][i+1:]...) // Add everything after b
-					case left:
-						groups[other] = groups[other][:len(groups[other])-1]        // Pop a
-						groups[other] = append(groups[other], tok)                  // Add self at a's place
-						groups[other] = append(groups[other], groups[other][i:]...) // Add everything after self
+					if !missingArg {
+						switch tok.neededArgs {
+						case leftRight:
+							groups[other] = groups[other][:len(groups[other])-1]        // Pop a
+							groups[other] = append(groups[other], tok)                  // Insert self at a's place
+							groups[other] = append(groups[other], groups[other][i:]...) // Add everything after b
+						case right:
+							groups[other] = append(groups[other], tok)                    // Add self
+							groups[other] = append(groups[other], groups[other][i+1:]...) // Add everything after b
+						case left:
+							groups[other] = groups[other][:len(groups[other])-1]        // Pop a
+							groups[other] = append(groups[other], tok)                  // Add self at a's place
+							groups[other] = append(groups[other], groups[other][i:]...) // Add everything after self
+						}
 					}
 					skip = true
 					ru = false
@@ -478,7 +499,7 @@ func calcNPr(n float64, r float64) float64 {
 // Show an error to the user
 func userError(content string) {
 	if calculationSuccess {
-		println(ansiRed, content, ansiReset)
+		fmt.Printf("%v%s%v\n", ansiRed, content, ansiReset)
 		println(ansiBlue, "If you believe this is a bug, please open an issue: https://github.com/Lich-Corals/coral-ctc-terminal-calculator/issues", ansiReset)
 
 	}
@@ -492,7 +513,7 @@ func userError(content string) {
 
 // Show a licence notice to the user
 func showLicence() {
-	println(ansiBlue, "\nCoral-CTC-Terminal-Calculator  Copyright (C) 2025  Linus Tibert\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions. You can view the licence here:\nhttps://github.com/Lich-Corals/coral-ctc-terminal-calculator/blob/mistress/LICENCE\n", ansiReset)
+	println("\nCoral-CTC-Terminal-Calculator  Copyright (C) 2025  Linus Tibert\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions. You can view the licence here:\nhttps://github.com/Lich-Corals/coral-ctc-terminal-calculator/\n", ansiBlue, "\nFor questions and issues, please head to the GitHub repository above.", ansiReset)
 
 }
 
