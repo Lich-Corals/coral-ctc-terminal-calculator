@@ -179,7 +179,16 @@ func GetSum(tokens []token) float64 {
 					case power:
 						tok.sum = math.Pow(a.sum, b.sum)
 					case root:
-						tok.sum = math.Pow(b.sum, 1.0/a.sum)
+						if b.sum < 0 && int(a.sum)%2 == 0 {
+							userError(fmt.Sprint("Negative numbers do not have roots of even numbers: ", b.sum, " // ", a.sum))
+						}
+						if a.sum == 0 {
+							userError(fmt.Sprint("Can't get the 0th root: ", a.sum, " // ", b.sum))
+						}
+						tok.sum = math.Pow(absolute(b.sum), 1.0/a.sum)
+						if b.sum < 0 {
+							tok.sum = -tok.sum
+						}
 					case multiplication:
 						tok.sum = a.sum * b.sum
 					case division:
@@ -382,6 +391,14 @@ func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
 	}
 	userError(fmt.Sprint("Unknown token: ", content))
 	return unknownTokenType, pX
+}
+
+// make a number absolute
+func absolute(x float64) float64 {
+	if x < 0 {
+		return -x
+	}
+	return x
 }
 
 // nCr-combinations
