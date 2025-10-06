@@ -416,7 +416,7 @@ func processToken(part string) []token {
 			case "g":
 				nP = 9.80665 // I've copied this value from Wikipedia. Seems correct to me.
 			case "c":
-				nP = 299792458
+				nP = 299792458 // Same here.
 			case "0":
 				nP = 0
 			case "1":
