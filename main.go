@@ -75,6 +75,8 @@ const (
 	modulo
 	logarithm
 	constant
+	nPr
+	nCr
 	openDelim
 	closeDelim
 )
@@ -150,12 +152,6 @@ func GetSum(tokens []token) float64 {
 	var withFactorials = []token{}
 	for i, tok := range summed {
 		if tok.token == factorial {
-			if len(decimalNumberRegex.FindAllString(summed[i-1].content[0], -1)) != 0 {
-				userError(fmt.Sprint("Factorial numbers can't be based on decimal numbers: ", summed[i-1].sum, " !"))
-			}
-			if summed[i-1].sum < 0 {
-				userError(fmt.Sprint("You can't get the factorial of a negative number: ", summed[i-1].sum, " !"))
-			}
 			tok.token = number
 			tok.priority = pX
 			tok.sum = fact(summed[i-1].sum)
@@ -206,6 +202,10 @@ func GetSum(tokens []token) float64 {
 							userError(fmt.Sprint("Logarithm with zero as base or x: ", a.sum, " log ", b.sum))
 						}
 						tok.sum = math.Log(a.sum) / math.Log(b.sum)
+					case nCr:
+						tok.sum = calcNCr(a.sum, b.sum)
+					case nPr:
+						tok.sum = calcNPr(a.sum, b.sum)
 					case addition:
 						tok.sum = a.sum + b.sum
 					case subtraction:
@@ -245,6 +245,14 @@ func GetSum(tokens []token) float64 {
 
 // Find the factorial of a number
 func fact(n float64) float64 {
+	if n != float64(int64(n)) {
+		userError(fmt.Sprint("Factorial numbers can't be based on decimal numbers: ", fmt.Sprintf("%f", n), " !"))
+		return 0.0
+	}
+	if n < 0 {
+		userError(fmt.Sprint("You can't get the factorial of a negative number: ", fmt.Sprintf("%f", n), " !"))
+		return 0.0
+	}
 	if n == 1 || n == 0 {
 		return 1.0
 	}
@@ -362,6 +370,10 @@ func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
 			return modulo, pB
 		case "log":
 			return logarithm, pC
+		case "nCr":
+			return nCr, pB
+		case "nPr":
+			return nPr, pB
 		case "(":
 			return openDelim, pX
 		case ")":
@@ -370,6 +382,16 @@ func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
 	}
 	userError(fmt.Sprint("Unknown token: ", content))
 	return unknownTokenType, pX
+}
+
+// nCr-combinations
+func calcNCr(n float64, r float64) float64 {
+	return fact(n) / (fact(r) * fact(n-r))
+}
+
+// nPr-permutations
+func calcNPr(n float64, r float64) float64 {
+	return fact(n) / fact(n-r)
 }
 
 // Show an error to the user
