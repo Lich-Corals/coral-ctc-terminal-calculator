@@ -48,7 +48,7 @@ var (
 var (
 	numberRegex                 = regexp.MustCompile(`^-{0,1}\d+(?:\.\d+){0,1}$`)
 	decimalNumberRegex          = regexp.MustCompile(`^-{0,1}\d+\.\d+$`)
-	constants          []string = []string{"pi", "tau", "e"}
+	constants          []string = []string{"pi", "tau", "e", "g", "phi", "c"}
 )
 
 type tokenType int8
@@ -411,6 +411,16 @@ func processToken(part string) []token {
 				nP = math.Pi * 2
 			case "e":
 				nP = math.E
+			case "phi":
+				nP = math.Phi
+			case "g":
+				nP = 9.80665 // I've copied this value from Wikipedia. Seems correct to me.
+			case "c":
+				nP = 299792458
+			case "0":
+				nP = 0
+			case "1":
+				nP = 1
 			default:
 				userError(fmt.Sprint("Constant not defined: ", part, "\nThis looks like a bug; please report."))
 			}
