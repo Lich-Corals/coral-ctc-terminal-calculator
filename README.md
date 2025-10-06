@@ -109,6 +109,8 @@ The following constants are supported
 - g (gravity)
 - c (speed of light)
 
+The negative of every constant `x` is available as `-x`. 
+
 > [!NOTE]   
 > Constants `g` and `c` use SI units.
 
