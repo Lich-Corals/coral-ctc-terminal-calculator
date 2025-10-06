@@ -81,6 +81,9 @@ const (
 	sine
 	cosine
 	tangent
+	sineDegrees
+	cosineDegrees
+	tangentDegrees
 	openDelim
 	closeDelim
 )
@@ -247,6 +250,12 @@ func GetSum(tokens []token) float64 {
 						tok.sum = math.Cos(b.sum)
 					case tangent:
 						tok.sum = math.Tan(b.sum)
+					case sineDegrees:
+						tok.sum = math.Sin(degreesToRadians(b.sum))
+					case cosineDegrees:
+						tok.sum = math.Cos(degreesToRadians(b.sum))
+					case tangentDegrees:
+						tok.sum = math.Tan(degreesToRadians(b.sum))
 					}
 					tok.token = number
 					switch tok.neededArgs {
@@ -427,6 +436,12 @@ func getTokenProperties(content string) (tokenType, tokenPriority, neededArgumet
 			return cosine, pA, right
 		case "tan":
 			return tangent, pA, right
+		case "dsin":
+			return sineDegrees, pA, right
+		case "dcos":
+			return cosineDegrees, pA, right
+		case "dtan":
+			return tangentDegrees, pA, right
 		case "(":
 			return openDelim, pX, noArgs
 		case ")":
@@ -435,6 +450,11 @@ func getTokenProperties(content string) (tokenType, tokenPriority, neededArgumet
 	}
 	userError(fmt.Sprint("Unknown token: ", content))
 	return unknownTokenType, pX, noArgs
+}
+
+// Convert degrees to radians
+func degreesToRadians(x float64) float64 {
+	return x * (math.Pi / 180)
 }
 
 // make a number absolute
