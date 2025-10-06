@@ -16,7 +16,7 @@
 
 // Priorities:
 // (X. Numbers, factorials, groups)
-// A. Powers, roots and sine, etc.
+// A. Powers, roots, absolute-function and sine, etc.
 // B. Multiplication, division, nCr, nPr and modulo
 // C. Addition, subtraction, logarithms
 //
@@ -84,6 +84,7 @@ const (
 	sineDegrees
 	cosineDegrees
 	tangentDegrees
+	absoluteFunction
 	openDelim
 	closeDelim
 )
@@ -255,6 +256,8 @@ func GetSum(tokens []token) float64 {
 							userError(fmt.Sprint("Logarithm with zero as base or x: ", a.sum, " log ", b.sum))
 						}
 						tok.sum = math.Log(a.sum) / math.Log(b.sum)
+					case absoluteFunction:
+						tok.sum = absolute(b.sum)
 					case nCr:
 						tok.sum = calcNCr(a.sum, b.sum)
 					case nPr:
@@ -473,6 +476,8 @@ func getTokenProperties(content string) (tokenType, tokenPriority, neededArgumet
 			return cosineDegrees, pA, right
 		case "dtan":
 			return tangentDegrees, pA, right
+		case "abs":
+			return absoluteFunction, pA, right
 		case "(":
 			return openDelim, pX, noArgs
 		case ")":
