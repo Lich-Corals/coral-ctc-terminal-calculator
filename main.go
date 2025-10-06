@@ -407,7 +407,7 @@ func processToken(part string) []token {
 		if tT == constant {
 			tT = number
 			nP := 0.0
-			switch part {
+			switch strings.Replace(part, "-", "", 1) {
 			case "pi":
 				nP = math.Pi
 			case "tau":
@@ -426,6 +426,9 @@ func processToken(part string) []token {
 				nP = 1
 			default:
 				userError(fmt.Sprint("Constant not defined: ", part, "\nThis looks like a bug; please report."))
+			}
+			if strings.Contains(part, "-") {
+				nP = -nP
 			}
 			part = fmt.Sprintf("%f", nP)
 		}
@@ -537,7 +540,18 @@ func showHelp() {
 	println("Please take a look at the git repository for detailed instructions on how to use this program:\nhttps://github.com/Lich-Corals/coral-ctc-terminal-calculator/")
 }
 
+// Add a -x for every constant x
+func updateConstants() {
+	var newConstants []string
+	for _, c := range constants {
+		newConstants = append(newConstants, fmt.Sprintf("-%s", c))
+		newConstants = append(newConstants, c)
+	}
+	constants = newConstants
+}
+
 func main() {
+	updateConstants()
 	var terminalArguments = os.Args
 	var tokens []token
 	var sum float64
