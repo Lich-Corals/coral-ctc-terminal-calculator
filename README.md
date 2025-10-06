@@ -1,5 +1,6 @@
 # Coral-CTC
 [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white)](https://github.com/Lich-Corals/coral-ctc-terminal-calculator)
+[![Sourceforge](https://img.shields.io/badge/-Sourceforge-FF6600?style=for-the-badge&logo=sourceforge&logoColor=white)](https://sourceforge.net/projects/coral-ctc-terminal-calculator/)
 [![Coffee Logo](https://img.shields.io/badge/-Buy%20me%20a%20coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black)](https://www.coff.ee/lichcorals)
 
 ## CTC terminal calculator
