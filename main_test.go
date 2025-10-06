@@ -12,8 +12,9 @@ type test struct {
 
 // Test a few valid calculations
 func TestValid(t *testing.T) {
-	tests := []test{{q: "1 + 1 - 2", e: 0.0}, {q: "1 / 2", e: 0.5}, {q: "5 * (5 + 5)", e: 50.0}, {q: "2 * (3 + (2 + 6.1) * 4) + ( 2 // 9 ! ) + 200 ** 0 + -5 * (1 + 2) ! + 5 % 2", e: 645.1952191045343}, {q: "8 log 10", e: 0.9030899869919434}}
+	tests := []test{{q: "1 + 1 - 2", e: 0.0}, {q: "1 / 2", e: 0.5}, {q: "5 * (5 + 5)", e: 50.0}, {q: "2 * (3 + (2 + 6.1) * 4) + ( 2 // 9 ! ) + 200 ** 0 + -5 * (1 + 2) ! + 5 % 2", e: 645.1952191045343}, {q: "8 log 10", e: 0.9030899869919434}, {q: "10 nCr 6", e: 210}, {q: "dsin 90", e: 1}, {q: "pi + -pi", e: 0.0}}
 	for _, te := range tests {
+		updateConstants()
 		got := GetSum(GetTokens(te.q))
 		if got != te.e {
 			t.Errorf("Got %f; wanted %f", got, te.e)
