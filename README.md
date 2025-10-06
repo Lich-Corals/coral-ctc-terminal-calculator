@@ -17,6 +17,10 @@ Supported operations are the following:
 - roots
 - modulo
 - logarithms
+- nPr and nCr
+- Sine, cosine and tangent
+- converting to absolute numbers
+- A few constants
 - grouping with parentheses
 
 ## Installation
@@ -73,18 +77,40 @@ The syntax is inspired by the syntax of the English language.
 Therefore, `2 ** 3` means _'2 to the 3'_ and `2 // 3` means _'the 2nd root of 3'_.
 
 Additionally, there is the `%` (modulo) operator, which is used like _'x mod y'_, and the `log` operator to get the logarithm of _x to the base y_ (`x log y`).
+Calculations like `sin x` or `dsin x` are also supported, where `sin` works with radians and `dsin` with degrees.
+N.b. the same works with the `cos` and `tan` functions.
+
+> [!NOTE]   
+> Promts like `cos tan xy` are currently not supported.   
+> Use `cos (tan xy)` instead.
+
+The `nPr` (permutations) and `nCr` (combinations) functions work like on most calculators; for example, `n nPr r` (or `x nPr y`) would be the following:
+> 
+> n! / (n - r)!
+>
 
 All other operations are the usual ones, as used in programming languages or other calculators.
 
 ### Priorities
 The applications works from left to right and prioritises operations in the following order:
 1. factorials
-2. roots and powers
-3. multiplication, division and modulo
+2. roots, powers, absolute-functions, sine, cosine, etc.
+3. multiplication, division, nPr, nCr and modulo
 4. addition, subtraction and logarithms
 
 The priorities can naturally be changed using parentheses.
 
+### Constants
+The following constants are supported
+- pi
+- tau
+- phi
+- e (Euler's number)
+- g (gravity)
+- c (speed of light)
+
+> [!NOTE]   
+> Constants `g` and `c` use SI units.
 
 ## Updating
 Currently, there is no way of getting notified by the application if an update is available.
