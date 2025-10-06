@@ -37,7 +37,7 @@ import (
 )
 
 // The current package version
-const pkgVersion = "0.3.1"
+const pkgVersion = "0.4.0"
 
 // Global variables
 var (
@@ -532,6 +532,11 @@ func showLicence() {
 
 }
 
+// Tell the user to get help somewhere else
+func showHelp() {
+	println("Please take a look at the git repository for detailed instructions on how to use this program:\nhttps://github.com/Lich-Corals/coral-ctc-terminal-calculator/")
+}
+
 func main() {
 	var terminalArguments = os.Args
 	var tokens []token
@@ -552,6 +557,9 @@ func main() {
 		case "--version":
 			println(ansiBlue, pkgVersion, ansiReset)
 			os.Exit(0)
+		case "--help", "-h", "help":
+			showHelp()
+			os.Exit(0)
 		}
 		tokens = GetTokens(terminalArguments[len(terminalArguments)-1])
 		sum = GetSum(tokens)
@@ -561,6 +569,7 @@ func main() {
 		for true {
 			fmt.Print("> ")
 			scanner := bufio.NewScanner(os.Stdin)
+			skipCommand := false
 			scanner.Scan()
 			err := scanner.Err()
 			if err != nil {
@@ -570,13 +579,18 @@ func main() {
 			switch line {
 			case ":q", "exit", "exit()":
 				os.Exit(0)
+			case "help":
+				showHelp()
+				skipCommand = true
 			}
-			tokens := GetTokens(line)
-			sum := GetSum(tokens)
-			if calculationSuccess {
-				fmt.Println(sum)
-			} else {
-				calculationSuccess = true
+			if !skipCommand {
+				tokens := GetTokens(line)
+				sum := GetSum(tokens)
+				if calculationSuccess {
+					fmt.Println(sum)
+				} else {
+					calculationSuccess = true
+				}
 			}
 		}
 	}
