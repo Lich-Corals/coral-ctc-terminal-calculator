@@ -16,9 +16,9 @@
 
 // Priorities:
 // (X. Numbers, factorials, groups)
-// A. Powers, roots
-// B. Multiplication, division and modulo
-// C. Addition, subtraction and logarithms
+// A. Powers, roots and sine, etc.
+// B. Multiplication, division, nCr, nPr and modulo
+// C. Addition, subtraction, logarithms
 //
 // Processing from left to right
 
@@ -54,6 +54,7 @@ var (
 type tokenType int8
 type tokenPriority int8
 type inputMode int8
+type neededArgumetns int8
 
 // Input mode mostly determines whether there is an argument; if there are none, continuous mode will be used.
 const (
@@ -77,6 +78,9 @@ const (
 	constant
 	nPr
 	nCr
+	sine
+	cosine
+	tangent
 	openDelim
 	closeDelim
 )
@@ -89,6 +93,14 @@ const (
 	pC
 )
 
+// Which which arguments are needed for an operation
+const (
+	noArgs neededArgumetns = iota
+	left
+	right
+	leftRight
+)
+
 const (
 	ansiRed   = "\033[31m"
 	ansiReset = "\033[0m"
@@ -96,11 +108,12 @@ const (
 )
 
 type token struct {
-	token     tokenType
-	priority  tokenPriority
-	content   []string
-	subTokens []token
-	sum       float64
+	token      tokenType
+	priority   tokenPriority
+	content    []string
+	subTokens  []token
+	sum        float64
+	neededArgs neededArgumetns
 }
 
 // Get tokens from input string
@@ -168,12 +181,21 @@ func GetSum(tokens []token) float64 {
 		var run = true
 		for run {
 			groups[other] = []token{}
-			var r = true
+			var ru = true
 			var skip = false
 			for i, tok := range groups[this] {
-				if tok.priority == pri && r {
-					var a = groups[this][i-1]
-					var b = groups[this][i+1]
+				if tok.priority == pri && ru {
+					var a token
+					var b token
+					switch tok.neededArgs {
+					case leftRight:
+						a = groups[this][i-1]
+						b = groups[this][i+1]
+					case left:
+						a = groups[this][i-1]
+					case right:
+						b = groups[this][i+1]
+					}
 					tok.priority = pX
 					switch tok.token {
 					case power:
@@ -219,13 +241,29 @@ func GetSum(tokens []token) float64 {
 						tok.sum = a.sum + b.sum
 					case subtraction:
 						tok.sum = a.sum - b.sum
+					case sine:
+						tok.sum = math.Sin(b.sum)
+					case cosine:
+						tok.sum = math.Cos(b.sum)
+					case tangent:
+						tok.sum = math.Tan(b.sum)
 					}
 					tok.token = number
-					groups[other] = groups[other][:len(groups[other])-1]
-					groups[other] = append(groups[other], tok)
-					groups[other] = append(groups[other], groups[other][i:]...)
+					switch tok.neededArgs {
+					case leftRight:
+						groups[other] = groups[other][:len(groups[other])-1]        // Pop a
+						groups[other] = append(groups[other], tok)                  // Insert self at a's place
+						groups[other] = append(groups[other], groups[other][i:]...) // Add everything after b
+					case right:
+						groups[other] = append(groups[other], tok)                    // Add self
+						groups[other] = append(groups[other], groups[other][i+1:]...) // Add everything after b
+					case left:
+						groups[other] = groups[other][:len(groups[other])-1]        // Pop a
+						groups[other] = append(groups[other], tok)                  // Add self at a's place
+						groups[other] = append(groups[other], groups[other][i:]...) // Add everything after self
+					}
 					skip = true
-					r = false
+					ru = false
 				} else {
 					if skip {
 						skip = false
@@ -241,7 +279,7 @@ func GetSum(tokens []token) float64 {
 			} else {
 				other = 1
 			}
-			if r {
+			if ru {
 				run = false
 			}
 		}
@@ -332,7 +370,7 @@ func processToken(part string) []token {
 	var parts = getSubTokens(part)
 	var tokens = []token{}
 	for _, part := range parts {
-		var tT, tP = getTokenTypeAndPriority(part)
+		var tT, tP, tA = getTokenProperties(part)
 		if tT == constant {
 			tT = number
 			nP := 0.0
@@ -348,49 +386,55 @@ func processToken(part string) []token {
 			}
 			part = fmt.Sprintf("%f", nP)
 		}
-		tokens = append(tokens, token{token: tT, priority: tP, content: []string{part}, subTokens: nil})
+		tokens = append(tokens, token{token: tT, priority: tP, content: []string{part}, subTokens: nil, neededArgs: tA})
 	}
 	return tokens
 }
 
 // Get the type and priority of an isolated token
-func getTokenTypeAndPriority(content string) (tokenType, tokenPriority) {
+func getTokenProperties(content string) (tokenType, tokenPriority, neededArgumetns) {
 	if len(numberRegex.FindAllString(content, -1)) == 1 {
-		return number, pX
+		return number, pX, noArgs
 	} else if slices.Contains(constants, content) {
-		return constant, pX
+		return constant, pX, noArgs
 	} else {
 		switch content {
 		case "+":
-			return addition, pC
+			return addition, pC, leftRight
 		case "-":
-			return subtraction, pC
+			return subtraction, pC, leftRight
 		case "*":
-			return multiplication, pB
+			return multiplication, pB, leftRight
 		case "/":
-			return division, pB
+			return division, pB, leftRight
 		case "**":
-			return power, pA
+			return power, pA, leftRight
 		case "//":
-			return root, pA
+			return root, pA, leftRight
 		case "!":
-			return factorial, pA
+			return factorial, pA, left
 		case "%":
-			return modulo, pB
+			return modulo, pB, leftRight
 		case "log":
-			return logarithm, pC
+			return logarithm, pC, leftRight
 		case "nCr":
-			return nCr, pB
+			return nCr, pB, leftRight
 		case "nPr":
-			return nPr, pB
+			return nPr, pB, leftRight
+		case "sin":
+			return sine, pA, right
+		case "cos":
+			return cosine, pA, right
+		case "tan":
+			return tangent, pA, right
 		case "(":
-			return openDelim, pX
+			return openDelim, pX, noArgs
 		case ")":
-			return closeDelim, pX
+			return closeDelim, pX, noArgs
 		}
 	}
 	userError(fmt.Sprint("Unknown token: ", content))
-	return unknownTokenType, pX
+	return unknownTokenType, pX, noArgs
 }
 
 // make a number absolute
