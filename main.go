@@ -582,7 +582,9 @@ func main() {
 		fmt.Println(sum)
 	case continuous:
 		showLicence()
-		cursorRune := "_"
+		cursorRune := "█"
+		commandHistory := []string{}
+		historyPos := 0
 		for true {
 			buf := bytes.NewBufferString("")
 			cursorPos := 0
@@ -593,6 +595,10 @@ func main() {
 				switch key.Code {
 				case keys.Enter:
 					line = buf.String()
+					if len(commandHistory) == 0 || commandHistory[len(commandHistory)-1] != buf.String() {
+						commandHistory = append(commandHistory, buf.String())
+					}
+					historyPos = len(commandHistory)
 					fmt.Printf("> %s\n", buf)
 					return true, nil
 				case keys.Backspace: // Remove last character
@@ -603,7 +609,7 @@ func main() {
 						cursorPos -= 1
 					}
 				case keys.Delete: // Remove next character
-					if cursorPos+1 < buf.Len() {
+					if cursorPos < buf.Len() {
 						n := bytes.NewBuffer(buf.Bytes()[0:cursorPos])
 						a := bytes.NewBuffer(buf.Bytes()[cursorPos+1:])
 						n.Write(a.Bytes())
@@ -617,6 +623,23 @@ func main() {
 					if cursorPos < buf.Len() {
 						cursorPos += 1
 					}
+				case keys.Up:
+					if historyPos > 0 {
+						historyPos -= 1
+						buf = bytes.NewBufferString(commandHistory[historyPos])
+					} else if len(commandHistory) > 0 {
+						buf = bytes.NewBufferString(commandHistory[0])
+					}
+					cursorPos = buf.Len()
+				case keys.Down:
+					if historyPos+1 < len(commandHistory) {
+						historyPos += 1
+						buf = bytes.NewBufferString(commandHistory[historyPos])
+					} else if historyPos+1 == len(commandHistory) {
+						historyPos += 1
+						buf = bytes.NewBufferString("")
+					}
+					cursorPos = buf.Len()
 				case keys.RuneKey, keys.Space: // Insert a character
 					n := bytes.NewBuffer(buf.Bytes()[:cursorPos])
 					a := bytes.NewBuffer(slices.Clone(buf.Bytes()[cursorPos:]))
@@ -630,7 +653,7 @@ func main() {
 			})
 			skipCommand := false
 			switch line {
-			case ":q", "exit", "exit()":
+			case ":q", "exit", "exit()", "fuck":
 				os.Exit(0)
 			case "help":
 				showHelp()
