@@ -43,14 +43,15 @@ const pkgVersion = "0.4.0"
 
 // Global variables
 var (
-	currentInputMode   = noInuputMode
-	calculationSuccess = true
+	currentInputMode             = noInuputMode
+	calculationSuccess           = true
+	lastAnswer         []float64 = nil
 )
 
 var (
 	numberRegex                 = regexp.MustCompile(`^-{0,1}\d+(?:\.\d+){0,1}$`)
 	decimalNumberRegex          = regexp.MustCompile(`^-{0,1}\d+\.\d+$`)
-	constants          []string = []string{"pi", "tau", "e", "g", "phi", "c"}
+	constants          []string = []string{"pi", "tau", "e", "g", "phi", "c", "ans"}
 )
 
 type tokenType int8
@@ -422,6 +423,12 @@ func processToken(part string) []token {
 				nP = 9.80665 // I've copied this value from Wikipedia. Seems correct to me.
 			case "c":
 				nP = 299792458 // Same here.
+			case "ans":
+				if lastAnswer != nil {
+					nP = lastAnswer[0]
+				} else {
+					userError("Can't use `ans` without previous answer!")
+				}
 			case "0":
 				nP = 0
 			case "1":
@@ -664,6 +671,7 @@ func main() {
 				sum := GetSum(tokens)
 				if calculationSuccess {
 					fmt.Println(sum)
+					lastAnswer = []float64{sum}
 				} else {
 					calculationSuccess = true
 				}
