@@ -25,15 +25,17 @@
 package main
 
 import (
-	"bufio"
+	"bytes"
 	"fmt"
-	"log"
 	"math"
 	"os"
 	"regexp"
 	"slices"
 	"strconv"
 	"strings"
+
+	"atomicgo.dev/keyboard"
+	"atomicgo.dev/keyboard/keys"
 )
 
 // The current package version
@@ -580,16 +582,53 @@ func main() {
 		fmt.Println(sum)
 	case continuous:
 		showLicence()
+		cursorRune := "_"
 		for true {
-			fmt.Print("> ")
-			scanner := bufio.NewScanner(os.Stdin)
+			buf := bytes.NewBufferString("")
+			cursorPos := 0
+			fmt.Printf("> %s\n", cursorRune)
+			line := ""
+			keyboard.Listen(func(key keys.Key) (stop bool, err error) {
+				fmt.Printf("\033[1A\033[K") // Clears the last line
+				switch key.Code {
+				case keys.Enter:
+					line = buf.String()
+					fmt.Printf("> %s\n", buf)
+					return true, nil
+				case keys.Backspace: // Remove last character
+					if cursorPos > 0 {
+						n := bytes.NewBuffer(buf.Bytes()[:cursorPos-1])
+						n.Write(buf.Bytes()[cursorPos:])
+						buf = n
+						cursorPos -= 1
+					}
+				case keys.Delete: // Remove next character
+					if cursorPos+1 < buf.Len() {
+						n := bytes.NewBuffer(buf.Bytes()[0:cursorPos])
+						a := bytes.NewBuffer(buf.Bytes()[cursorPos+1:])
+						n.Write(a.Bytes())
+						buf = n
+					}
+				case keys.Left:
+					if cursorPos > 0 {
+						cursorPos -= 1
+					}
+				case keys.Right:
+					if cursorPos < buf.Len() {
+						cursorPos += 1
+					}
+				case keys.RuneKey, keys.Space: // Insert a character
+					n := bytes.NewBuffer(buf.Bytes()[:cursorPos])
+					a := bytes.NewBuffer(slices.Clone(buf.Bytes()[cursorPos:]))
+					n.WriteByte(byte(key.Runes[0]))
+					n.Write(a.Bytes())
+					cursorPos += 1
+					buf = n
+				}
+				fmt.Printf("> %s%s%s\n", string(buf.Bytes()[0:cursorPos]), cursorRune, string(buf.Bytes()[cursorPos:])) // Prints the line with cursor
+				return false, nil
+			})
 			skipCommand := false
-			scanner.Scan()
-			err := scanner.Err()
-			if err != nil {
-				log.Fatal(err)
-			}
-			line := scanner.Text()
 			switch line {
 			case ":q", "exit", "exit()":
 				os.Exit(0)
@@ -606,6 +645,7 @@ func main() {
 					calculationSuccess = true
 				}
 			}
+
 		}
 	}
 }
