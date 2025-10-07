@@ -1,3 +1,17 @@
+## [0.5.0]
+### Added
+- A custom cursor
+- Left/right with arrow keys
+- Removal of next character using `Delete`
+- Command history
+- `ans` for previous answer
+- `fuck` keyword for exiting (because `Ctrl+C` doesn't work any more)
+### Fixed
+- `^[[A` and similar inserted for arrow keys
+### Added dependencies
+- `atomicgo.dev/keyboard`
+- `atomicgo.dev/keyboard/keys`
+
 ## [0.4.0]
 ### Added
 - nPr and nCr calculations

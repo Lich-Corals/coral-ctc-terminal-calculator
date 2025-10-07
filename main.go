@@ -39,7 +39,7 @@ import (
 )
 
 // The current package version
-const pkgVersion = "0.4.0"
+const pkgVersion = "0.5.0"
 
 // Global variables
 var (
