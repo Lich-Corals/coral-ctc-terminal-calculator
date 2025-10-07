@@ -29,7 +29,7 @@ Supported operations are the following:
 - grouping with parentheses
 
 ## Installation
-1. Download the binary `ctc` from the [latest release](https://github.com/Lich-Corals/coral-ctc-terminal-calculator/releases/latest).
+1. Download the binary `ctc_xy` for your architecture and OS from the [latest release](https://github.com/Lich-Corals/coral-ctc-terminal-calculator/releases/latest).
 2. Place the file in a useful location (e.g. `~/.local/bin/ctc`)
 3. Make the file executable (e.g. `chmod +x ~/.local/bin/ctc`)
 4. Add an alias to your shells configuration file:
@@ -51,6 +51,13 @@ The `ctc` command should be available in every newly launched terminal now.
 > [!TIP]   
 > You can use any path and any alias.
 > `~/.local/bin/ctc` and `ctc` are just the recommended options.
+
+> [!CAUTION]   
+> MacOS and Windows binaries are included from release 0.4.0.
+> These are not tested yet, because I don't have access to those operating systems.
+> 
+> The setup, especially for Windows will be different from what was said above.
+> If you can confirm that CTC is running on Windows or MacOS, you're welcome to let me know in an issue!
 
 > [!NOTE]   
 > To compile the code yourself, clone the repository and run `go build` in the directory.
