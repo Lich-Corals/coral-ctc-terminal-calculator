@@ -3,6 +3,10 @@
 [![Sourceforge](https://img.shields.io/badge/-Sourceforge-FF6600?style=for-the-badge&logo=sourceforge&logoColor=white)](https://sourceforge.net/projects/coral-ctc-terminal-calculator/)
 [![Coffee Logo](https://img.shields.io/badge/-Buy%20me%20a%20coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black)](https://www.coff.ee/lichcorals)
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/03021b04-a2d6-4ad6-b470-11343def681a">
+</p>
+
 ## CTC terminal calculator
 CTC is a minimal and easy-to-use calculator application for your terminal.<br/>
 This project is meant for people who are quick with terminal applications, who may want a replacement for a GUI calculator.
