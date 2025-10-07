@@ -27,6 +27,8 @@ Supported operations are the following:
 - converting to absolute numbers
 - A few constants
 - grouping with parentheses
+- A variable for the previous answer
+- A command history
 
 ## Installation
 1. Download the binary `ctc_xy` for your architecture and OS from the [latest release](https://github.com/Lich-Corals/coral-ctc-terminal-calculator/releases/latest).
@@ -77,7 +79,12 @@ $ ctc
 2
 > exit
 ```
-The mode can be exited by sending a `exit`, `:q`, `exit()`, or by pressing ctrl+c.
+
+You can navigate using the arrow keys; `Up` and `Down` are used to access the command history.
+To send a command, press the `Enter` key.
+`Delete`-key for deletion of the next character is supported.
+
+The mode can be exited by sending a `exit`, `:q` and `exit()`.
 
 Every part of the calculation must be separated by a space.
 The only exceptions are parentheses, which may be directly connected to a number (e.g. `(2 * 5)`).
@@ -126,11 +133,15 @@ The negative of every constant `x` is available as `-x`.
 > [!NOTE]   
 > Constants `g` and `c` use SI units.
 
+### Special values
+The "constant" `ans` can be used to insert the previous answer.
+
 ## Updating
 Currently, there is no way of getting notified by the application if an update is available.
 Neither is this package available for any package manager.
 <br/>
 If you want to get notifications from GitHub, consider watching release activity for this repository.
+It is also possible to enable e-mail notifications on SourceForge.
 <br/>
 To update the program, repeat steps 1 to 3 from the installation instructions.
 
