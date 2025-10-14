@@ -678,7 +678,7 @@ func main() {
 			})
 			skipCommand := false
 			switch line {
-			case ":q", "exit", "exit()", "fuck", "quit":
+			case ":q", ";q", "exit", "exit()", "fuck", "quit":
 				os.Exit(0)
 			case "help":
 				showHelp()
@@ -694,7 +694,6 @@ func main() {
 					calculationSuccess = true
 				}
 			}
-
 		}
 	}
 }
