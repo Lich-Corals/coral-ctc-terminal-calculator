@@ -439,7 +439,7 @@ func processToken(part string) []token {
 			if strings.Contains(part, "-") {
 				nP = -nP
 			}
-			part = fmt.Sprintf("%f", nP)
+			part = strconv.FormatFloat(nP, 'f', -1, 64)
 		}
 		tokens = append(tokens, token{token: tT, priority: tP, content: []string{part}, subTokens: nil, neededArgs: tA})
 	}
@@ -586,7 +586,7 @@ func main() {
 		}
 		tokens = GetTokens(terminalArguments[len(terminalArguments)-1])
 		sum = GetSum(tokens)
-		fmt.Println(sum)
+		fmt.Println(strconv.FormatFloat(sum, 'f', -1, 64))
 	case continuous:
 		showLicence()
 		cursorRune := "█"
@@ -670,7 +670,7 @@ func main() {
 				tokens := GetTokens(line)
 				sum := GetSum(tokens)
 				if calculationSuccess {
-					fmt.Println(sum)
+					fmt.Println(strconv.FormatFloat(sum, 'f', -1, 64))
 					lastAnswer = []float64{sum}
 				} else {
 					calculationSuccess = true
