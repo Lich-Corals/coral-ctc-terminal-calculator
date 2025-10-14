@@ -1,3 +1,14 @@
+## [0.5.1]
+### Added
+- Automatic placement of `)` if `(` is inserted in continuous mode
+- Automatic removal of adjacent closing brackets
+- `quit` and `;q` keywords to exit continuous mode
+### Changed
+- The appearance and behaviour of the cursor to classic inverted-colour
+### Fixed
+- Wrong results when working with some constants
+- Aggressive rounding of long results
+
 ## [0.5.0]
 ### Added
 - A custom cursor

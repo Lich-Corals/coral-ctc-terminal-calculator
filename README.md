@@ -65,7 +65,7 @@ The `ctc` command should be available in every newly launched terminal now.
 > To compile the code yourself, clone the repository and run `go build` in the directory.
 
 ## Usage
-### Basic syntax
+### Basic syntax and usage
 The application runs with a single argument in quotes:
 ```bash
 ctc "5 * 2 // 9 + 5.4 * 10"
@@ -82,9 +82,9 @@ $ ctc
 
 You can navigate using the arrow keys; `Up` and `Down` are used to access the command history.
 To send a command, press the `Enter` key.
-`Delete`-key for deletion of the next character is supported.
+`Delete`-key for deletion of the cursor's character is supported.
 
-The mode can be exited by sending a `exit`, `:q` and `exit()`.
+The mode can be exited by sending a `exit`, `quit`, `:q`, `;q` and `exit()`.
 
 Every part of the calculation must be separated by a space.
 The only exceptions are parentheses, which may be directly connected to a number (e.g. `(2 * 5)`).
