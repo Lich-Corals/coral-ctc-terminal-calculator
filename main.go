@@ -612,14 +612,21 @@ func main() {
 				case keys.Backspace: // Remove last character
 					if cursorPos > 0 {
 						n := bytes.NewBuffer(buf.Bytes()[:cursorPos-1])
-						n.Write(buf.Bytes()[cursorPos:])
+						if cursorPos < buf.Len() && buf.Bytes()[cursorPos-1] == '(' && buf.Bytes()[cursorPos] == ')' {
+							n.Write(buf.Bytes()[cursorPos+1:])
+						} else {
+							n.Write(buf.Bytes()[cursorPos:])
+						}
 						buf = n
 						cursorPos -= 1
 					}
-				case keys.Delete: // Remove next character
+				case keys.Delete: // Remove current character
 					if cursorPos < buf.Len() {
 						n := bytes.NewBuffer(buf.Bytes()[0:cursorPos])
 						a := bytes.NewBuffer(buf.Bytes()[cursorPos+1:])
+						if cursorPos < buf.Len()-1 && buf.Bytes()[cursorPos] == '(' && buf.Bytes()[cursorPos+1] == ')' {
+							a = bytes.NewBuffer(a.Bytes()[1:])
+						}
 						n.Write(a.Bytes())
 						buf = n
 					}
