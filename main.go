@@ -420,9 +420,9 @@ func processToken(part string) []token {
 			case "phi":
 				nP = math.Phi
 			case "g":
-				nP = 9.80665 // I've copied this value from Wikipedia. Seems correct to me.
+				nP = 9.8066500 // https://oeis.org/A072915
 			case "c":
-				nP = 299792458 // Same here.
+				nP = 299792458.0 // https://oeis.org/A003678
 			case "ans":
 				if lastAnswer != nil {
 					nP = lastAnswer[0]
