@@ -651,6 +651,9 @@ func main() {
 					n := bytes.NewBuffer(buf.Bytes()[:cursorPos])
 					a := bytes.NewBuffer(slices.Clone(buf.Bytes()[cursorPos:]))
 					n.WriteByte(byte(key.Runes[0]))
+					if key.Runes[0] == '(' {
+						n.WriteByte(')')
+					}
 					n.Write(a.Bytes())
 					cursorPos += 1
 					buf = n
@@ -660,7 +663,7 @@ func main() {
 			})
 			skipCommand := false
 			switch line {
-			case ":q", "exit", "exit()", "fuck":
+			case ":q", "exit", "exit()", "fuck", "quit":
 				os.Exit(0)
 			case "help":
 				showHelp()
