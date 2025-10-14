@@ -662,9 +662,7 @@ func main() {
 				pre := string(buf.Bytes()[0:cursorPos])
 				cur := cursorRune
 				suf := string(buf.Bytes()[cursorPos:])
-				if cursorPos == buf.Len() {
-					cur = cursorRune
-				} else {
+				if cursorPos != buf.Len() {
 					cur = fmt.Sprintf("%s%s%s", ansiInvert, string(buf.Bytes()[cursorPos]), ansiReset)
 					suf = string(buf.Bytes()[cursorPos+1:])
 				}
