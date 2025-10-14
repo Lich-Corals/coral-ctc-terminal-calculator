@@ -109,9 +109,10 @@ const (
 )
 
 const (
-	ansiRed   = "\033[31m"
-	ansiReset = "\033[0m"
-	ansiBlue  = "\033[34m"
+	ansiRed    = "\033[31m"
+	ansiReset  = "\033[0m"
+	ansiBlue   = "\033[34m"
+	ansiInvert = "\033[7m"
 )
 
 type token struct {
@@ -658,7 +659,16 @@ func main() {
 					cursorPos += 1
 					buf = n
 				}
-				fmt.Printf("> %s%s%s\n", string(buf.Bytes()[0:cursorPos]), cursorRune, string(buf.Bytes()[cursorPos:])) // Prints the line with cursor
+				pre := string(buf.Bytes()[0:cursorPos])
+				cur := cursorRune
+				suf := string(buf.Bytes()[cursorPos:])
+				if cursorPos == buf.Len() {
+					cur = cursorRune
+				} else {
+					cur = fmt.Sprintf("%s%s%s", ansiInvert, string(buf.Bytes()[cursorPos]), ansiReset)
+					suf = string(buf.Bytes()[cursorPos+1:])
+				}
+				fmt.Printf("> %s%s%s\n", pre, cur, suf)
 				return false, nil
 			})
 			skipCommand := false
