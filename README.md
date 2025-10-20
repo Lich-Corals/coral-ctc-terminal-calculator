@@ -66,6 +66,8 @@ The `ctc` command should be available in every newly launched terminal now.
 
 ## Usage
 ### Basic syntax and usage
+Run the program with `help` as argument or run `help` in continuous mode to quickly get information about operators.
+
 The application runs with a single argument in quotes:
 ```bash
 ctc "5 * 2 // 9 + 5.4 * 10"
