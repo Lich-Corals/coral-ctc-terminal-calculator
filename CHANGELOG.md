@@ -1,3 +1,13 @@
+## [0.5.2]
+### Added
+- Help for specific commands
+- An overview of commands if `help` is used without specifying commands
+### Fixed
+- nPr and nCr returning decimal results for large results
+- overly precise results with wrong values for numbers smaller than 10^(-15)
+- Negative zero
+- Factorial allowing integer overflow
+
 ## [0.5.1]
 ### Added
 - Automatic placement of `)` if `(` is inserted in continuous mode
