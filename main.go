@@ -516,12 +516,12 @@ func absolute(x float64) float64 {
 
 // nCr-combinations
 func calcNCr(n float64, r float64) float64 {
-	return fact(n) / (fact(r) * fact(n-r))
+	return math.Round(fact(n) / (fact(r) * fact(n-r)))
 }
 
 // nPr-permutations
 func calcNPr(n float64, r float64) float64 {
-	return fact(n) / fact(n-r)
+	return math.Round(fact(n) / fact(n-r))
 }
 
 // Show an error to the user
