@@ -283,6 +283,11 @@ func GetSum(tokens []token) float64 {
 					case tangentDegrees:
 						tok.sum = math.Tan(degreesToRadians(b.sum))
 					}
+					res, _ := strconv.ParseFloat(strconv.FormatFloat(tok.sum, 'f', 15, 64), 64)
+					if res == 0.0 {
+						res = 0.0 // This may seem pointless, but if res is -0.0, it will be turned positive.
+					}
+					tok.sum = res
 					tok.token = number
 					if !missingArg {
 						switch tok.neededArgs {
@@ -636,6 +641,10 @@ func updateConstants() {
 	constants = newConstants
 }
 
+func cleanResult(sum float64) string {
+	return strconv.FormatFloat(sum, 'f', -1, 64)
+}
+
 func main() {
 	updateConstants()
 	var terminalArguments = os.Args
@@ -664,7 +673,7 @@ func main() {
 		}
 		tokens = GetTokens(terminalArguments[len(terminalArguments)-1])
 		sum = GetSum(tokens)
-		fmt.Println(strconv.FormatFloat(sum, 'f', -1, 64))
+		fmt.Println(cleanResult(sum))
 	case continuous:
 		showLicence()
 		cursorRune := "█"
@@ -766,7 +775,7 @@ func main() {
 				tokens := GetTokens(line)
 				sum := GetSum(tokens)
 				if calculationSuccess {
-					fmt.Println(strconv.FormatFloat(sum, 'f', -1, 64))
+					fmt.Println(cleanResult(sum))
 					lastAnswer = []float64{sum}
 				} else {
 					calculationSuccess = true
