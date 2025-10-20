@@ -546,8 +546,30 @@ func showLicence() {
 }
 
 // Tell the user to get help somewhere else
-func showHelp() {
-	println("Please take a look at the git repository for detailed instructions on how to use this program:\nhttps://github.com/Lich-Corals/coral-ctc-terminal-calculator/")
+func showHelp(args []string) {
+	if len(args) == 1 {
+		msg := `Please run 'help [token 1] [token 2] [token n]' with supported token(s):
+
+help
+		
+For more information, please visit the repository:
+https://github.com/Lich-Corals/coral-ctc-terminal-calculator/`
+		println(msg)
+	} else {
+		for _, arg := range args[1:] {
+			msg := ""
+			switch arg {
+			case "help":
+				msg = "Shows the help page."
+			default:
+				userError(fmt.Sprint("Unknown token: ", arg))
+				msg = "error"
+			}
+			if msg != "error" {
+				fmt.Printf("\t%s: %s\n", arg, msg)
+			}
+		}
+	}
 }
 
 // Add a -x for every constant x
@@ -567,8 +589,6 @@ func main() {
 	var sum float64
 	if len(terminalArguments) == 1 {
 		currentInputMode = continuous
-	} else if len(terminalArguments) > 2 {
-		userError("Too many arguments!")
 	} else {
 		currentInputMode = single
 	}
@@ -582,8 +602,11 @@ func main() {
 			println(ansiBlue, pkgVersion, ansiReset)
 			os.Exit(0)
 		case "--help", "-h", "help":
-			showHelp()
+			showHelp(terminalArguments[1:])
 			os.Exit(0)
+		}
+		if len(terminalArguments) > 2 {
+			userError("Too many arguments!")
 		}
 		tokens = GetTokens(terminalArguments[len(terminalArguments)-1])
 		sum = GetSum(tokens)
@@ -680,8 +703,9 @@ func main() {
 			switch line {
 			case ":q", ";q", "exit", "exit()", "fuck", "quit":
 				os.Exit(0)
-			case "help":
-				showHelp()
+			}
+			if strings.Split(line, " ")[0] == "help" {
+				showHelp(strings.Split(line, " "))
 				skipCommand = true
 			}
 			if !skipCommand {
