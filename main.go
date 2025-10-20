@@ -551,7 +551,23 @@ func showHelp(args []string) {
 		msg := `Please run 'help [token 1] [token 2] [token n]' with supported token(s):
 
 help
-		
++
+-
+*
+/
+**
+//
+!
+%
+log
+nCr
+nPr
+sin, cos, tan
+dsin, dcos, dtan
+abs
+(, )
+CONSTANTS
+
 For more information, please visit the repository:
 https://github.com/Lich-Corals/coral-ctc-terminal-calculator/`
 		println(msg)
@@ -561,6 +577,43 @@ https://github.com/Lich-Corals/coral-ctc-terminal-calculator/`
 			switch arg {
 			case "help":
 				msg = "Shows the help page."
+			case "+":
+				msg = "Adds two numbers: '6 + 9' = 15"
+			case "-":
+				msg = "Subtracts a from b: '4 - 3' = 1"
+			case "*":
+				msg = "Multiplies two numbers: '2 * 5' = 10"
+			case "/":
+				msg = "Divides a by b: '10 / 2' = 5"
+			case "**":
+				msg = "Gives a to the power of b: '5 ** 2' = 25"
+			case "//":
+				msg = "Gives the a-th root of b: '2 // 25' = 5"
+			case "!":
+				msg = "Gives the factorial of a number: '5 !' = 120"
+			case "%":
+				msg = "Returns a mod b (the remainder of 'a / b'): '3 % 2' = 1"
+			case "log":
+				msg = "Returns the logarithm of a to the base y: '100 log 10' = 2"
+			case "nCr":
+				msg = "Used for combinations: '10 nCr 3' = 120"
+			case "nPr":
+				msg = "Used for permutations: '10 nPr 3' = 720"
+			case "sin", "cos", "tan":
+				msg = "Acts as a sine/cosine/tangent function using radians: 'sin pi' = 0\nFor degrees use dsin/dcos/dtan."
+			case "dsin", "dcos", "dtan":
+				msg = "Acts as a sine/cosine/tangent function using degrees: 'dsin 360' = 0\n For radians use sin/cos/tan"
+			case "abs":
+				msg = "Turns a number positive: 'abs -5' = 5; 'abs 5' = 5"
+			case "(", ")":
+				msg = "Groups a calculation to change the priorities: '(5 + 5) / 2' = 5"
+			case "CONSTANTS":
+				msg = "Constants act as exact, predefined numbers. All constants can be negated by adding a '-' in front of them. Supported constants are\n"
+				for _, c := range constants {
+					if !strings.Contains(c, "-") {
+						msg += c + "\n"
+					}
+				}
 			default:
 				userError(fmt.Sprint("Unknown token: ", arg))
 				msg = "error"
@@ -569,6 +622,7 @@ https://github.com/Lich-Corals/coral-ctc-terminal-calculator/`
 				fmt.Printf("\t%s: %s\n", arg, msg)
 			}
 		}
+		println("\nFor more information, please visit the GitHub repository:\nhttps://github.com/Lich-Corals/coral-ctc-terminal-calculator/")
 	}
 }
 
