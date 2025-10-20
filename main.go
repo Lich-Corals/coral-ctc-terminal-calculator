@@ -346,6 +346,9 @@ func fact(n float64) float64 {
 		return 1.0
 	}
 	var fact = n * fact(n-1)
+	if absolute(fact) == math.Inf(1) {
+		userError("Factorial out of integer limits: Factorials larger than 170! are too large.")
+	}
 	return fact
 }
 
