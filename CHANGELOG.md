@@ -1,3 +1,8 @@
+## [0.5.3]
+### Added
+- Constant h (Planck constant)
+- Constant N_A (Avogadro constant)
+
 ## [0.5.2]
 ### Added
 - Help for specific commands

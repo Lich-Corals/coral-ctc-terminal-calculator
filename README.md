@@ -129,6 +129,8 @@ The following constants are supported
 - e (Euler's number)
 - g (gravity)
 - c (speed of light)
+- h (Planck constant)
+- N_A (Avogadro constant)
 
 The negative of every constant `x` is available as `-x`. 
 
