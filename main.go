@@ -1,5 +1,5 @@
 // Coral-CTC-Terminal-Calculator - Minimal terminal calculator
-// Copyright (C) 2025  Linus Tibert
+// Copyright (C) 2025  Jax Tibert
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public Licence as published
@@ -553,7 +553,7 @@ func userError(content string) {
 
 // Show a licence notice to the user
 func showLicence() {
-	println("\nCoral-CTC-Terminal-Calculator  Copyright (C) 2025  Linus Tibert\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions. You can view the licence here:\nhttps://github.com/Lich-Corals/coral-ctc-terminal-calculator/\n", ansiBlue, "\nFor questions and issues, please head to the GitHub repository above.", ansiReset)
+	println("\nCoral-CTC-Terminal-Calculator  Copyright (C) 2025  Jax Tibert\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions. You can view the licence here:\nhttps://github.com/Lich-Corals/coral-ctc-terminal-calculator/\n", ansiBlue, "\nFor questions and issues, please head to the GitHub repository above.", ansiReset)
 
 }
 
