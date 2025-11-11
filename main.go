@@ -51,7 +51,7 @@ var (
 var (
 	numberRegex                 = regexp.MustCompile(`^-{0,1}\d+(?:\.\d+){0,1}$`)
 	decimalNumberRegex          = regexp.MustCompile(`^-{0,1}\d+\.\d+$`)
-	constants          []string = []string{"pi", "tau", "e", "g", "phi", "c", "ans"}
+	constants          []string = []string{"pi", "tau", "e", "g", "phi", "c", "ans", "h", "N_A"}
 )
 
 type tokenType int8
@@ -432,6 +432,10 @@ func processToken(part string) []token {
 				nP = 9.8066500 // https://oeis.org/A072915
 			case "c":
 				nP = 299792458.0 // https://oeis.org/A003678
+			case "h":
+				nP = 6.62607015 * math.Pow10(-34) // https://oeis.org/A003676
+			case "N_A":
+				nP = 6.02214076 * math.Pow10(23) // https://oeis.org/A322578
 			case "ans":
 				if lastAnswer != nil {
 					nP = lastAnswer[0]
