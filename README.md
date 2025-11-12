@@ -4,9 +4,9 @@
 [![Coffee Logo](https://img.shields.io/badge/-Buy%20me%20a%20coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black)](https://www.coff.ee/lichcorals)
 
 > [!IMPORTANT]  
-> For and Microsoft- and _other_-Reasons, this project will migrate to Codeberg soon.
+> For and Microsoft- and _other_-Reasons, this project has been migrated to Codeberg.
 >
-> If you still want to support this project, consider starring it on Codeberghttps://codeberg.org/Lich-Corals/linux-file-converter-addon.
+> If you still want to support this project, consider starring it on Codeberg.
 > 
 > [![Codeberg](https://img.shields.io/badge/-view_on_codeberg-2185D0?style=for-the-badge&logo=Codeberg&logoColor=white)](https://codeberg.org/Lich-Corals/coral-ctc-terminal-calculator)
 
