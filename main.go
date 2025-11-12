@@ -352,6 +352,38 @@ func fact(n float64) float64 {
 	return fact
 }
 
+// Add certain separators to number strings
+func addSeparators(num string, sep string) string {
+	pStyle := '.'
+	pPos := 0
+	numNew := ""
+
+	if sep == "." {
+		num = strings.Replace(num, ".", ",", 1)
+		pStyle = ','
+	}
+
+	if len(num) > 3 {
+		intPrt := strings.Split(num, string(pStyle))[0]
+		for i := range intPrt {
+			n := intPrt[len(intPrt)-i-1]
+
+			p := pPos + i
+			if p%3 == 0 && i != 0 {
+				numNew = sep + numNew
+			}
+			numNew = string(n) + numNew
+		}
+		if strings.Contains(num, string(pStyle)) {
+			numNew += string(pStyle)
+			numNew += strings.Split(num, string(pStyle))[1]
+		}
+		return numNew
+	} else {
+		return num
+	}
+}
+
 // Move all contents of parentheses into the sub-tokens part of their opening delimiter
 func makeGroups(tokens []token) []token {
 	var grouped = []token{}
@@ -648,8 +680,12 @@ func updateConstants() {
 	constants = newConstants
 }
 
-func cleanResult(sum float64) string {
-	return strconv.FormatFloat(sum, 'f', -1, 64)
+func cleanResult(sum float64, sepStyle string) string {
+	res := strconv.FormatFloat(sum, 'f', -1, 64)
+	if sepStyle != "" {
+		res = addSeparators(res, sepStyle)
+	}
+	return res
 }
 
 func main() {
@@ -657,10 +693,27 @@ func main() {
 	var terminalArguments = os.Args
 	var tokens []token
 	var sum float64
+	sepStyle := ""
 	if len(terminalArguments) == 1 {
 		currentInputMode = continuous
 	} else {
-		currentInputMode = single
+		for _, a := range terminalArguments {
+			switch strings.Split(a, "=")[0] {
+			case "--separators":
+				currentInputMode = continuous
+				s := strings.Split(a, "=")[1]
+				switch s {
+				case "space":
+					sepStyle = " "
+				case "comma":
+					sepStyle = ","
+				case "period", "dot", "fullstop", "point":
+					sepStyle = "."
+				}
+			default:
+				currentInputMode = single
+			}
+		}
 	}
 	switch currentInputMode {
 	case single:
@@ -675,12 +728,12 @@ func main() {
 			showHelp(terminalArguments[1:])
 			os.Exit(0)
 		}
-		if len(terminalArguments) > 2 {
+		if len(terminalArguments) > 3 {
 			userError("Too many arguments!")
 		}
 		tokens = GetTokens(terminalArguments[len(terminalArguments)-1])
 		sum = GetSum(tokens)
-		fmt.Println(cleanResult(sum))
+		fmt.Println(cleanResult(sum, sepStyle))
 	case continuous:
 		showLicence()
 		cursorRune := "█"
@@ -782,7 +835,7 @@ func main() {
 				tokens := GetTokens(line)
 				sum := GetSum(tokens)
 				if calculationSuccess {
-					fmt.Println(cleanResult(sum))
+					fmt.Println(cleanResult(sum, sepStyle))
 					lastAnswer = []float64{sum}
 				} else {
 					calculationSuccess = true
