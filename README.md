@@ -154,6 +154,7 @@ __Values__
 - space
 
 __Description__
+
 Adds separators for readability (e.g. 1.000 instead of 1000)
 
 > [!TIP]
