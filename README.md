@@ -3,6 +3,13 @@
 [![Sourceforge](https://img.shields.io/badge/-Sourceforge-FF6600?style=for-the-badge&logo=sourceforge&logoColor=white)](https://sourceforge.net/projects/coral-ctc-terminal-calculator/)
 [![Coffee Logo](https://img.shields.io/badge/-Buy%20me%20a%20coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black)](https://www.coff.ee/lichcorals)
 
+> [!IMPORTANT]  
+> For and Microsoft- and _other_-Reasons, this project will migrate to Codeberg soon.
+>
+> If you still want to support this project, consider starring it on Codeberghttps://codeberg.org/Lich-Corals/linux-file-converter-addon.
+> 
+> [![Codeberg](https://img.shields.io/badge/-view_on_codeberg-2185D0?style=for-the-badge&logo=Codeberg&logoColor=white)](https://codeberg.org/Lich-Corals/coral-ctc-terminal-calculator)
+
 <p align="center">
   <img src="https://github.com/user-attachments/assets/03021b04-a2d6-4ad6-b470-11343def681a">
 </p>
