@@ -1,3 +1,7 @@
+## [0.6.0]
+### Added
+- Optional argument for separators (e.g. 1.000 instead of 1000)
+
 ## [0.5.3]
 ### Added
 - Constant h (Planck constant)

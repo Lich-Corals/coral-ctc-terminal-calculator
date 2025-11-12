@@ -70,13 +70,13 @@ Run the program with `help` as argument or run `help` in continuous mode to quic
 
 The application runs with a single argument in quotes:
 ```bash
-ctc "5 * 2 // 9 + 5.4 * 10"
+ctc [optional arguments] "5 * 2 // 9 + 5.4 * 10"]
 ```
 This command takes the second root of 9 (`2 // 9`), multiplies it by 5 and adds 5.4 times 10 to it.
 
 CTC also has a continuous mode:
 ```bash
-$ ctc
+$ ctc [optional arguments]
 > 1 + 1
 2
 > exit
@@ -139,6 +139,25 @@ The negative of every constant `x` is available as `-x`.
 
 ### Special values
 The "constant" `ans` can be used to insert the previous answer.
+
+### Optional arguments
+Optional arguments have to be used with the following pattern:
+```
+--argument-name=value
+```
+
+Supported arguments are:
+#### --separators
+__Values__
+- comma
+- dot / period / fullstop
+- space
+
+__Description__
+Adds separators for readability (e.g. 1.000 instead of 1000)
+
+> [!TIP]
+> If you are using an alias or a function to use CTC, you may add the optional arguments to it to set them as default settings.
 
 ## Updating
 Currently, there is no way of getting notified by the application if an update is available.
